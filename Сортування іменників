@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вправа: Сортування іменників</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .drag-item {
+            cursor: grab;
+            transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+            user-select: none;
+        }
+        .drag-item:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .drag-over {
+            border-color: #2563eb;
+            background-color: #dbeafe;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 md:p-10 lg:p-12 rounded-2xl shadow-xl max-w-4xl w-full">
+        <!-- Title and Instructions -->
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">РОЗПОДІЛІТЬ ІМЕННИКИ ЗА РОДОМ</h1>
+        <p class="text-center text-lg text-gray-600 mb-8">Перетягніть слова у відповідні колонки.</p>
+
+        <!-- Words to sort -->
+        <div id="word-list" class="flex flex-wrap justify-center gap-2 mb-8 p-4 bg-gray-100 rounded-lg shadow-inner">
+            <!-- Words will be dynamically inserted here -->
+        </div>
+
+        <!-- Sorting columns -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Masculine column -->
+            <div id="masculine-col" data-gender="masculine" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-gray-700 mb-4">Чоловічий рід</h2>
+                <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
+            </div>
+
+            <!-- Feminine column -->
+            <div id="feminine-col" data-gender="feminine" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-gray-700 mb-4">Жіночий рід</h2>
+                <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
+            </div>
+
+            <!-- Neuter column -->
+            <div id="neuter-col" data-gender="neuter" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-gray-700 mb-4">Середній рід</h2>
+                <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
+            </div>
+        </div>
+
+        <!-- Feedback and buttons -->
+        <div class="flex flex-col sm:flex-row justify-center gap-4 mt-8">
+            <button id="check-button" class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-300">
+                Перевірити
+            </button>
+            <button id="reset-button" class="px-6 py-3 bg-gray-300 text-gray-800 font-semibold rounded-xl shadow-md hover:bg-gray-400 transition-colors duration-300">
+                Скинути
+            </button>
+        </div>
+        
+        <div id="feedback-message" class="text-center font-semibold text-lg mt-6 py-2 rounded-lg transition-all duration-300"></div>
+    </div>
+
+    <script>
+        // Data structure containing the words and their correct gender.
+        // This is the "answer key" for the exercise.
+        const nouns = [
+            { word: "autobus", gender: "masculine" },
+            { word: "adresa", gender: "feminine" },
+            { word: "auto", gender: "neuter" },
+            { word: "banka", gender: "feminine" },
+            { word: "Carlo", gender: "masculine" },
+            { word: "centrum", gender: "neuter" },
+            { word: "cigareta", gender: "feminine" },
+            { word: "číslo", gender: "neuter" },
+            { word: "doktor", gender: "masculine" },
+            { word: "doktorka", gender: "feminine" },
+            { word: "efekt", gender: "masculine" },
+            { word: "futbalista", gender: "masculine" },
+            { word: "gitara", gender: "feminine" },
+            { word: "gramatika", gender: "feminine" },
+            { word: "hotel", gender: "masculine" },
+            { word: "charakter", gender: "masculine" },
+            { word: "inštitúcia", gender: "feminine" },
+            { word: "inštitút", gender: "masculine" },
+            { word: "izba", gender: "feminine" },
+            { word: "kino", gender: "neuter" },
+            { word: "kľúč", gender: "masculine" },
+            { word: "koncert", gender: "masculine" },
+            { word: "lektor", gender: "masculine" },
+            { word: "lektorka", gender: "feminine" },
+            { word: "mapa", gender: "feminine" },
+            { word: "minúta", gender: "feminine" },
+            { word: "mobil", gender: "masculine" },
+            { word: "Nemecko", gender: "neuter" },
+            { word: "objekt", gender: "masculine" },
+            { word: "politika", gender: "feminine" },
+            { word: "pošta", gender: "feminine" },
+            { word: "problém", gender: "masculine" },
+            { word: "proces", gender: "masculine" },
+            { word: "profesor", gender: "masculine" },
+            { word: "profesorka", gender: "feminine" },
+            { word: "projekt", gender: "masculine" },
+            { word: "rádio", gender: "neuter" },
+            { word: "recepcia", gender: "feminine" },
+            { word: "reštaurácia", gender: "feminine" },
+            { word: "sekunda", gender: "feminine" },
+            { word: "sezóna", gender: "feminine" },
+            { word: "šéf", gender: "masculine" },
+            { word: "šéfka", gender: "feminine" },
+            { word: "štadión", gender: "masculine" },
+            { word: "študent", gender: "masculine" },
+            { word: "študentka", gender: "feminine" },
+            { word: "taxík", gender: "masculine" },
+            { word: "telefón", gender: "masculine" },
+            { word: "televízia", gender: "feminine" },
+            { word: "tréning", gender: "masculine" },
+            { word: "univerzita", gender: "feminine" },
+            { word: "víkend", gender: "masculine" },
+            { word: "slovenčina", gender: "feminine" },
+            { word: "jablko", gender: "neuter" },
+            { word: "voda", gender: "feminine" },
+            { word: "tričko", gender: "neuter" },
+            { word: "čaj", gender: "masculine" }
+        ];
+
+        // Map for quick gender lookup
+        const nounGenderMap = new Map(nouns.map(item => [item.word, item.gender]));
+
+        // DOM elements
+        const wordList = document.getElementById('word-list');
+        const dropZones = document.querySelectorAll('[data-gender]');
+        const checkButton = document.getElementById('check-button');
+        const resetButton = document.getElementById('reset-button');
+        const feedbackMessage = document.getElementById('feedback-message');
+        
+        let draggedItem = null;
+
+        // --- Helper function to shuffle an array (Fisher-Yates algorithm) ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Function to create and render the draggable words ---
+        function createWordElements() {
+            // Clear the word list first
+            wordList.innerHTML = '';
+            // Shuffle the nouns for a new order each time
+            const shuffledNouns = shuffleArray([...nouns]);
+            
+            shuffledNouns.forEach(noun => {
+                const item = document.createElement('div');
+                item.textContent = noun.word;
+                item.setAttribute('draggable', 'true');
+                item.classList.add(
+                    'drag-item', 'px-4', 'py-2', 'bg-gray-200', 'text-gray-800', 'rounded-full', 'font-medium',
+                    'shadow-sm', 'hover:bg-gray-300', 'transition-colors', 'duration-200'
+                );
+                item.dataset.word = noun.word;
+                
+                // Drag start event
+                item.addEventListener('dragstart', (e) => {
+                    draggedItem = e.target;
+                    e.dataTransfer.setData('text/plain', e.target.dataset.word);
+                    setTimeout(() => e.target.classList.add('opacity-50'), 0);
+                });
+                
+                // Drag end event
+                item.addEventListener('dragend', () => {
+                    draggedItem.classList.remove('opacity-50');
+                    draggedItem = null;
+                });
+
+                wordList.appendChild(item);
+            });
+        }
+
+        // --- Drag and drop event listeners for columns ---
+        dropZones.forEach(zone => {
+            const dropContainer = zone.querySelector('div');
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragenter', (e) => {
+                e.preventDefault();
+                zone.classList.add('drag-over');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('drag-over');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('drag-over');
+                if (draggedItem && dropContainer) {
+                    dropContainer.appendChild(draggedItem);
+                }
+            });
+        });
+
+        // --- Check answers function ---
+        checkButton.addEventListener('click', () => {
+            let correctCount = 0;
+            let totalWords = 0;
+
+            // Reset all colors
+            document.querySelectorAll('.drag-item').forEach(item => {
+                item.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
+            });
+
+            // Check each column
+            dropZones.forEach(zone => {
+                const gender = zone.dataset.gender;
+                const itemsInColumn = zone.querySelectorAll('.drag-item');
+                totalWords += itemsInColumn.length;
+                
+                itemsInColumn.forEach(item => {
+                    const word = item.dataset.word;
+                    const correctGender = nounGenderMap.get(word);
+                    
+                    if (correctGender === gender) {
+                        item.classList.add('bg-green-500', 'text-white');
+                        correctCount++;
+                    } else {
+                        item.classList.add('bg-red-500', 'text-white');
+                    }
+                });
+            });
+
+            // Display feedback message
+            feedbackMessage.textContent = `Ви правильно розподілили ${correctCount} із ${totalWords} слів.`;
+            feedbackMessage.classList.remove('text-green-600', 'text-red-600');
+            if (correctCount === totalWords && totalWords > 0) {
+                feedbackMessage.classList.add('text-green-600');
+            } else if (totalWords > 0) {
+                feedbackMessage.classList.add('text-red-600');
+            }
+        });
+
+        // --- Reset function ---
+        resetButton.addEventListener('click', () => {
+            const allWords = document.querySelectorAll('.drag-item');
+            allWords.forEach(item => {
+                wordList.appendChild(item);
+                item.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
+            });
+            feedbackMessage.textContent = '';
+            feedbackMessage.classList.remove('text-green-600', 'text-red-600');
+            
+            // Re-create words to shuffle their initial order
+            createWordElements();
+        });
+
+        // Initialize the exercise on page load
+        window.onload = createWordElements;
+    </script>
+</body>
+</html>

@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вивчення країн словацькою мовою</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main quiz container -->
+    <div id="quiz-container" class="bg-white p-8 md:p-10 lg:p-12 rounded-2xl shadow-xl max-w-lg w-full transform transition-all duration-300 scale-100">
+
+        <!-- Header -->
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-6 md:mb-8">Вивчення країн словацькою</h1>
+
+        <!-- Quiz content area -->
+        <div id="quiz-content">
+            
+            <!-- Question prompt container -->
+            <div class="flex flex-col items-center text-center mb-6">
+                <!-- Flag placeholder -->
+                <img id="flag-image" src="" alt="Прапор країни" class="w-24 h-16 md:w-32 md:h-20 mb-4 rounded-lg shadow-md">
+                <!-- Question text -->
+                <p id="question-text" class="text-lg md:text-xl text-gray-700 font-medium"></p>
+            </div>
+
+            <!-- Options grid -->
+            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <!-- Buttons will be dynamically added here -->
+            </div>
+
+            <!-- Feedback message area -->
+            <div id="feedback-message" class="text-center font-semibold text-lg py-2 rounded-lg transition-all duration-300 opacity-0 transform -translate-y-2"></div>
+
+            <!-- Next button -->
+            <button id="next-button" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-blue-700 transition-colors duration-300 opacity-0 pointer-events-none mt-4">
+                Наступне запитання
+            </button>
+        </div>
+
+        <!-- Score display at the end -->
+        <div id="result-container" class="hidden text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Тест завершено!</h2>
+            <p id="final-score" class="text-2xl text-gray-600 mb-6"></p>
+            <button id="restart-button" class="w-full bg-green-600 text-white font-semibold py-3 rounded-xl shadow-md hover:bg-green-700 transition-colors duration-300">
+                Спробувати ще раз
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Array of questions with updated prompts and data.
+        const questions = [
+            {
+                prompt_sk: "Hans je Nemec. Hans je z...",
+                correct_answer: "Nemecka",
+                flag_code: "de",
+                distractors: ["Francúzska", "Maďarska", "Poľska"],
+                country_uk: "Німеччина"
+            },
+            {
+                prompt_sk: "Anna je Slovenka. Anna je zo...",
+                correct_answer: "Slovenska",
+                flag_code: "sk",
+                distractors: ["Česka", "Rakúska", "Maďarska"],
+                country_uk: "Словаччина"
+            },
+            {
+                prompt_sk: "Marco je Talian. Marco je z...",
+                correct_answer: "Talianska",
+                flag_code: "it",
+                distractors: ["Švajčiarska", "Francúzska", "Rakúska"],
+                country_uk: "Італія"
+            },
+            {
+                prompt_sk: "Maria je Rakúšanka. Maria je z...",
+                correct_answer: "Rakúska",
+                flag_code: "at",
+                distractors: ["Švajčiarska", "Nemecka", "Slovenska"],
+                country_uk: "Австрія"
+            },
+            {
+                prompt_sk: "Piotr je Poliak. Piotr je z...",
+                correct_answer: "Poľska",
+                flag_code: "pl",
+                distractors: ["Česka", "Ukrajiny", "Nemecka"],
+                country_uk: "Польща"
+            },
+            {
+                prompt_sk: "Lucia je Češka. Lucia je z...",
+                correct_answer: "Česka",
+                flag_code: "cz",
+                distractors: ["Slovenska", "Maďarska", "Poľska"],
+                country_uk: "Чехія"
+            },
+            {
+                prompt_sk: "Péter je Maďar. Péter je z...",
+                correct_answer: "Maďarska",
+                flag_code: "hu",
+                distractors: ["Slovenska", "Rakúska", "Rumunska"],
+                country_uk: "Угорщина"
+            },
+            {
+                prompt_sk: "Olena je Ukrajinka. Olena je z...",
+                correct_answer: "Ukrajiny",
+                flag_code: "ua",
+                distractors: ["Ruska", "Poľska", "Moldavska"],
+                country_uk: "Україна"
+            },
+            {
+                prompt_sk: "John je Angličan. John je z...",
+                correct_answer: "Anglicka",
+                flag_code: "gb",
+                distractors: ["Škótska", "USA", "Kanady"],
+                country_uk: "Англія"
+            },
+            {
+                prompt_sk: "Li je Číňan. Li je z...",
+                correct_answer: "Číny",
+                flag_code: "cn",
+                distractors: ["Japonska", "Kórey", "Vietnamu"],
+                country_uk: "Китай"
+            }
+        ];
+
+        // --- DOM Elements ---
+        const quizContainer = document.getElementById('quiz-container');
+        const quizContent = document.getElementById('quiz-content');
+        const resultContainer = document.getElementById('result-container');
+        const flagImage = document.getElementById('flag-image');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const nextButton = document.getElementById('next-button');
+        const finalScore = document.getElementById('final-score');
+        const restartButton = document.getElementById('restart-button');
+
+        // --- Game State Variables ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+
+        // --- Helper Function to Shuffle an Array (Fisher-Yates) ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Function to Start or Restart the Quiz ---
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = shuffleArray([...questions]); // Create a shuffled copy of the questions
+            quizContent.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            loadQuestion();
+        }
+
+        // --- Function to Load a New Question ---
+        function loadQuestion() {
+            // Check if all questions are answered
+            if (currentQuestionIndex >= shuffledQuestions.length) {
+                showResults();
+                return;
+            }
+            
+            // Get the current question data
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            
+            // Set the question text from the new prompt
+            questionText.textContent = currentQuestion.prompt_sk;
+
+            // Set the flag image
+            flagImage.src = `https://flagcdn.com/160x120/${currentQuestion.flag_code}.png`;
+            flagImage.alt = `Прапор ${currentQuestion.country_uk}`;
+            
+            // Prepare and shuffle the options
+            const allOptions = [currentQuestion.correct_answer, ...currentQuestion.distractors];
+            const shuffledOptions = shuffleArray(allOptions);
+            
+            // Clear previous options and feedback
+            optionsContainer.innerHTML = '';
+            feedbackMessage.textContent = '';
+            feedbackMessage.classList.remove('text-green-600', 'text-red-600', 'opacity-100');
+            nextButton.classList.add('opacity-0', 'pointer-events-none');
+            
+            // Create buttons for each option
+            shuffledOptions.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.classList.add(
+                    "bg-gray-200", "text-gray-800", "font-semibold", "py-3", "px-4", "rounded-xl",
+                    "hover:bg-gray-300", "transition-colors", "duration-200", "shadow-sm", "text-sm", "md:text-base"
+                );
+                button.addEventListener('click', () => checkAnswer(button, option, currentQuestion.correct_answer));
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // --- Function to Check the User's Answer ---
+        function checkAnswer(selectedButton, selectedAnswer, correctAnswer) {
+            // Disable all option buttons after a choice is made
+            Array.from(optionsContainer.children).forEach(button => {
+                button.removeEventListener('click', () => {}); // Prevent multiple clicks
+                button.classList.add('cursor-not-allowed', 'pointer-events-none');
+            });
+
+            if (selectedAnswer === correctAnswer) {
+                score++;
+                selectedButton.classList.add('bg-green-500', 'text-white', 'hover:bg-green-500');
+                feedbackMessage.textContent = 'Правильно!';
+                feedbackMessage.classList.add('text-green-600', 'opacity-100', 'transform-none');
+            } else {
+                selectedButton.classList.add('bg-red-500', 'text-white', 'hover:bg-red-500');
+                feedbackMessage.textContent = `Неправильно. Правильна відповідь: ${correctAnswer}`;
+                feedbackMessage.classList.add('text-red-600', 'opacity-100', 'transform-none');
+                
+                // Highlight the correct answer
+                Array.from(optionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) {
+                        button.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+                        button.classList.add('bg-green-500', 'text-white');
+                    }
+                });
+            }
+            
+            // Show the next button
+            nextButton.classList.remove('opacity-0', 'pointer-events-none');
+        }
+
+        // --- Function to Show the Final Results ---
+        function showResults() {
+            quizContent.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+            finalScore.textContent = `Ваш результат: ${score} із ${shuffledQuestions.length} правильних відповідей.`;
+        }
+
+        // --- Event Listeners ---
+        nextButton.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        restartButton.addEventListener('click', startQuiz);
+
+        // --- Initial Call to Start the Quiz ---
+        window.onload = startQuiz;
+    </script>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktívne cvičenie: Finančná gramotnosť</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-option.correct {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            border-color: #16a34a; /* green-600 */
+        }
+        .quiz-option.incorrect {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            border-color: #dc2626; /* red-600 */
+        }
+        .quiz-option:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="bg-white w-full max-w-2xl p-6 sm:p-8 rounded-xl shadow-lg">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 text-center">Interaktívne cvičenie</h1>
+        <p class="text-slate-600 mb-6 text-center">Doplňte správne slovo do každej vety.</p>
+
+        <div id="questions-wrapper" class="space-y-6">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <div id="result-container" class="hidden text-center mt-8 p-6 bg-slate-50 rounded-lg">
+            <h2 class="text-2xl font-bold text-slate-800">Váš výsledok</h2>
+            <p id="score" class="text-4xl font-bold text-blue-600 my-3"></p>
+            <p id="feedback-message" class="text-slate-600 mb-4"></p>
+            <button id="reset-button" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                Skúsiť znova
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                sentence: "Keď platím za elektrinu, internet a plyn, platím svoje ___.",
+                options: ["úspory", "účty", "príjem"],
+                correct: "účty"
+            },
+            {
+                sentence: "Peniaze, ktoré dostávam každý mesiac od zamestnávateľa, sa volajú ___.",
+                options: ["plat", "daň", "hypotéka"],
+                correct: "plat"
+            },
+            {
+                sentence: "Aby som vedel, koľko peňazí som minul a zarobil, každý mesiac si robím ___.",
+                options: ["nájomné", "rozpočet", "výdavky"],
+                correct: "rozpočet"
+            },
+            {
+                sentence: "Rodina si kúpila nový dom, ale musela si naň vziať ___ z banky.",
+                options: ["účet", "plat", "hypotéku"],
+                correct: "hypotéku"
+            },
+            {
+                sentence: "Tento mesiac bol môj ___ vyšší, pretože som dostal bonus v práci.",
+                options: ["výdavok", "príjem", "nájomné"],
+                correct: "príjem"
+            },
+            {
+                sentence: "Ak chceš ísť na dovolenku, musíš si začať tvoriť ___.",
+                options: ["úspory", "daň", "účty"],
+                correct: "úspory"
+            },
+            {
+                sentence: "Každý pracujúci človek musí zo svojho príjmu platiť štátu ___.",
+                options: ["rozpočet", "daň", "plat"],
+                correct: "daň"
+            }
+        ];
+
+        const questionsWrapper = document.getElementById('questions-wrapper');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const resetButton = document.getElementById('reset-button');
+
+        let score = 0;
+        let answeredQuestions = 0;
+
+        function renderQuestions() {
+            questionsWrapper.innerHTML = '';
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'p-5 bg-slate-50 border border-slate-200 rounded-lg';
+                
+                const sentence = document.createElement('p');
+                sentence.className = 'text-lg text-slate-700 mb-4';
+                sentence.textContent = q.sentence.replace('___', '______');
+                
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0';
+
+                q.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.className = 'quiz-option w-full text-left sm:text-center px-4 py-2 bg-white border-2 border-slate-300 rounded-md hover:bg-slate-200 hover:border-slate-400 transition-colors duration-200';
+                    button.dataset.questionIndex = index;
+                    
+                    button.addEventListener('click', () => handleAnswer(button, option, index));
+                    
+                    optionsDiv.appendChild(button);
+                });
+
+                questionDiv.appendChild(sentence);
+                questionDiv.appendChild(optionsDiv);
+                questionsWrapper.appendChild(questionDiv);
+            });
+        }
+
+        function handleAnswer(button, selectedOption, questionIndex) {
+            const question = questions[questionIndex];
+            const optionButtons = button.parentElement.querySelectorAll('.quiz-option');
+
+            if (selectedOption === question.correct) {
+                button.classList.add('correct');
+                score++;
+            } else {
+                button.classList.add('incorrect');
+                // Highlight the correct answer
+                optionButtons.forEach(btn => {
+                    if (btn.textContent === question.correct) {
+                        btn.classList.add('correct');
+                    }
+                });
+            }
+
+            optionButtons.forEach(btn => {
+                btn.disabled = true;
+            });
+
+            answeredQuestions++;
+            if (answeredQuestions === questions.length) {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            scoreElement.textContent = `${score} / ${questions.length}`;
+            let message = '';
+            if (score === questions.length) {
+                message = 'Výborne! Všetko správne.';
+            } else if (score >= questions.length / 2) {
+                message = 'Dobrý výkon, len tak ďalej!';
+            } else {
+                message = 'Nevadí, skús to znova a zlepšíš sa!';
+            }
+            feedbackMessage.textContent = message;
+            resultContainer.classList.remove('hidden');
+        }
+
+        function resetQuiz() {
+            score = 0;
+            answeredQuestions = 0;
+            resultContainer.classList.add('hidden');
+            renderQuestions();
+        }
+
+        resetButton.addEventListener('click', resetQuiz);
+
+        // Initial render
+        renderQuestions();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktívne cvičenie: Spojte slová</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .item {
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .item.selected {
+            background-color: #dbeafe; /* blue-100 */
+            border-color: #3b82f6; /* blue-500 */
+        }
+        .item.matched {
+            background-color: #dcfce7; /* green-100 */
+            border-color: #22c55e; /* green-500 */
+            color: #166534; /* green-800 */
+            cursor: not-allowed;
+            font-weight: 600;
+        }
+        #lines-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Allows clicking through the SVG layer */
+            z-index: 0;
+        }
+        .main-container {
+            position: relative;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0); }
+          20%, 80% { transform: translate3d(2px, 0, 0); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+          40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .item.shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            border-color: #ef4444; /* red-500 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4 py-8">
+
+    <div class="bg-white w-full max-w-2xl p-6 sm:p-8 rounded-xl shadow-lg">
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-800 mb-2 text-center">Cvičenie: Spojte slová</h1>
+        <p class="text-slate-600 mb-6 text-center">Kliknutím spojte slovesá zľava so správnymi podstatnými menami vpravo.</p>
+        
+        <div class="main-container">
+            <svg id="lines-svg"></svg>
+            <div class="flex justify-between relative z-10">
+                <div id="verbs-column" class="w-2/5 space-y-2"></div>
+                <div id="nouns-column" class="w-2/5 space-y-2"></div>
+            </div>
+        </div>
+        
+        <div id="result-container" class="hidden text-center mt-8 p-6 bg-slate-50 rounded-lg">
+            <h2 class="text-2xl font-bold text-slate-800">Váš výsledok</h2>
+            <p id="score" class="text-4xl font-bold text-blue-600 my-3"></p>
+            <button id="reset-button" class="bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300">
+                Skúsiť znova
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const matchingPairs = [
+            { verb: 'mať vysoké', noun: 'výdavky' },
+            { verb: 'dostávať', noun: 'plat' },
+            { verb: 'platiť', noun: 'účty' },
+            { verb: 'splácať', noun: 'hypotéku' },
+            { verb: 'odvádzať štátu', noun: 'daň' },
+            { verb: 'vytvoriť si finančné', noun: 'úspory' },
+            { verb: 'zostavovať si podrobný', noun: 'rozpočet' }
+        ];
+
+        const verbsColumn = document.getElementById('verbs-column');
+        const nounsColumn = document.getElementById('nouns-column');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const resetButton = document.getElementById('reset-button');
+        const svgContainer = document.getElementById('lines-svg');
+
+        let selectedVerb = null;
+        let score = 0;
+
+        function shuffle(array) {
+            return [...array].sort(() => Math.random() - 0.5);
+        }
+
+        function renderGame() {
+            score = 0;
+            selectedVerb = null;
+            verbsColumn.innerHTML = '';
+            nounsColumn.innerHTML = '';
+            svgContainer.innerHTML = '';
+            resultContainer.classList.add('hidden');
+
+            const shuffledVerbs = shuffle(matchingPairs.map(p => p.verb));
+            const shuffledNouns = shuffle(matchingPairs.map(p => p.noun));
+
+            shuffledVerbs.forEach(verb => {
+                const div = document.createElement('div');
+                div.textContent = verb;
+                div.className = 'item verb-item p-3 bg-white border-2 border-slate-300 rounded-md';
+                div.dataset.value = verb;
+                div.addEventListener('click', () => handleSelect(div, 'verb'));
+                verbsColumn.appendChild(div);
+            });
+
+            shuffledNouns.forEach(noun => {
+                const div = document.createElement('div');
+                div.textContent = noun;
+                div.className = 'item noun-item p-3 bg-white border-2 border-slate-300 rounded-md';
+                div.dataset.value = noun;
+                div.addEventListener('click', () => handleSelect(div, 'noun'));
+                nounsColumn.appendChild(div);
+            });
+        }
+
+        function handleSelect(element, type) {
+            if (element.classList.contains('matched')) return;
+
+            if (type === 'verb') {
+                if (selectedVerb) {
+                    selectedVerb.classList.remove('selected');
+                }
+                if (selectedVerb === element) {
+                    selectedVerb = null; // deselect if clicked again
+                } else {
+                    selectedVerb = element;
+                    element.classList.add('selected');
+                }
+            } else if (type === 'noun' && selectedVerb) {
+                const verbValue = selectedVerb.dataset.value;
+                const nounValue = element.dataset.value;
+
+                const isMatch = matchingPairs.some(p => p.verb === verbValue && p.noun === nounValue);
+
+                if (isMatch) {
+                    selectedVerb.classList.add('matched');
+                    selectedVerb.classList.remove('selected');
+                    element.classList.add('matched');
+                    score++;
+                    drawLine(selectedVerb, element);
+                    selectedVerb = null;
+                    if (score === matchingPairs.length) {
+                        showResult();
+                    }
+                } else {
+                    selectedVerb.classList.add('shake');
+                    element.classList.add('shake');
+                    setTimeout(() => {
+                        selectedVerb.classList.remove('shake');
+                        element.classList.remove('shake');
+                    }, 500);
+                }
+            }
+        }
+        
+        function drawLine(el1, el2) {
+            const containerRect = svgContainer.parentElement.getBoundingClientRect();
+            const rect1 = el1.getBoundingClientRect();
+            const rect2 = el2.getBoundingClientRect();
+
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            const x1 = rect1.right - containerRect.left;
+            const y1 = rect1.top + rect1.height / 2 - containerRect.top;
+            const x2 = rect2.left - containerRect.left;
+            const y2 = rect2.top + rect2.height / 2 - containerRect.top;
+
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.setAttribute('stroke', '#22c55e');
+            line.setAttribute('stroke-width', '3');
+            svgContainer.appendChild(line);
+        }
+
+        function showResult() {
+            scoreElement.textContent = `Správne: ${score} / ${matchingPairs.length}`;
+            resultContainer.classList.remove('hidden');
+        }
+        
+        resetButton.addEventListener('click', renderGame);
+
+        renderGame();
+    </script>
+</body>
+</html>
+
+

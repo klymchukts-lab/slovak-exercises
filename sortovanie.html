@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вправа: Сортування іменників</title>
+    <title>Вправа: Сортування іменників за відмінюванням</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,10 +31,10 @@
 </head>
 <body class="flex items-center justify-center min-h-screen p-4">
 
-    <div class="bg-white p-8 md:p-10 lg:p-12 rounded-2xl shadow-xl max-w-4xl w-full">
+    <div class="bg-white p-6 md:p-8 lg:p-10 rounded-2xl shadow-xl max-w-7xl w-full">
         <!-- Title and Instructions -->
-        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">РОЗПОДІЛІТЬ ІМЕННИКИ ЗА РОДОМ</h1>
-        <p class="text-center text-lg text-gray-600 mb-8">Перетягніть слова у відповідні колонки.</p>
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-2">РОЗПОДІЛІТЬ ІМЕННИКИ ЗА ТИПАМИ ВІДМІНЮВАННЯ</h1>
+        <p class="text-center text-lg text-gray-600 mb-8">Перетягніть слова у відповідні колонки, враховуючи рід та істотність/неістотність.</p>
 
         <!-- Words to sort -->
         <div id="word-list" class="flex flex-wrap justify-center gap-2 mb-8 p-4 bg-gray-100 rounded-lg shadow-inner">
@@ -42,22 +42,32 @@
         </div>
 
         <!-- Sorting columns -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Masculine column -->
-            <div id="masculine-col" data-gender="masculine" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
-                <h2 class="text-xl font-bold text-gray-700 mb-4">Чоловічий рід</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Masculine Animate column -->
+            <div id="masculine-animate-col" data-type="masculine-animate" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-center text-gray-700 mb-2">Чоловічий рід (істоти)</h2>
+                <p class="text-sm text-center text-gray-500 mb-4">(muž, kolega)</p>
+                <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
+            </div>
+
+            <!-- Masculine Inanimate column -->
+            <div id="masculine-inanimate-col" data-type="masculine-inanimate" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-center text-gray-700 mb-2">Чоловічий рід (неістоти)</h2>
+                <p class="text-sm text-center text-gray-500 mb-4">(plán, počítač)</p>
                 <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
             </div>
 
             <!-- Feminine column -->
-            <div id="feminine-col" data-gender="feminine" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
-                <h2 class="text-xl font-bold text-gray-700 mb-4">Жіночий рід</h2>
+            <div id="feminine-col" data-type="feminine" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-center text-gray-700 mb-2">Жіночий рід</h2>
+                <p class="text-sm text-center text-gray-500 mb-4">(žena, stanica, loď, miestnosť)</p>
                 <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
             </div>
 
             <!-- Neuter column -->
-            <div id="neuter-col" data-gender="neuter" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
-                <h2 class="text-xl font-bold text-gray-700 mb-4">Середній рід</h2>
+            <div id="neuter-col" data-type="neuter" class="flex flex-col items-center p-4 rounded-xl border-2 border-dashed border-gray-300 transition-colors duration-200">
+                <h2 class="text-xl font-bold text-center text-gray-700 mb-2">Середній рід</h2>
+                <p class="text-sm text-center text-gray-500 mb-4">(mesto, more, poschodie, dievča)</p>
                 <div class="w-full h-full min-h-[200px] p-2 flex flex-wrap content-start gap-2 bg-gray-50 rounded-lg"></div>
             </div>
         </div>
@@ -76,74 +86,73 @@
     </div>
 
     <script>
-        // Data structure containing the words and their correct gender.
-        // This is the "answer key" for the exercise.
+        // Data structure containing the words and their correct declension type.
         const nouns = [
-            { word: "autobus", gender: "masculine" },
-            { word: "adresa", gender: "feminine" },
-            { word: "auto", gender: "neuter" },
-            { word: "banka", gender: "feminine" },
-            { word: "Carlo", gender: "masculine" },
-            { word: "centrum", gender: "neuter" },
-            { word: "cigareta", gender: "feminine" },
-            { word: "číslo", gender: "neuter" },
-            { word: "doktor", gender: "masculine" },
-            { word: "doktorka", gender: "feminine" },
-            { word: "efekt", gender: "masculine" },
-            { word: "futbalista", gender: "masculine" },
-            { word: "gitara", gender: "feminine" },
-            { word: "gramatika", gender: "feminine" },
-            { word: "hotel", gender: "masculine" },
-            { word: "charakter", gender: "masculine" },
-            { word: "inštitúcia", gender: "feminine" },
-            { word: "inštitút", gender: "masculine" },
-            { word: "izba", gender: "feminine" },
-            { word: "kino", gender: "neuter" },
-            { word: "kľúč", gender: "masculine" },
-            { word: "koncert", gender: "masculine" },
-            { word: "lektor", gender: "masculine" },
-            { word: "lektorka", gender: "feminine" },
-            { word: "mapa", gender: "feminine" },
-            { word: "minúta", gender: "feminine" },
-            { word: "mobil", gender: "masculine" },
-            { word: "Nemecko", gender: "neuter" },
-            { word: "objekt", gender: "masculine" },
-            { word: "politika", gender: "feminine" },
-            { word: "pošta", gender: "feminine" },
-            { word: "problém", gender: "masculine" },
-            { word: "proces", gender: "masculine" },
-            { word: "profesor", gender: "masculine" },
-            { word: "profesorka", gender: "feminine" },
-            { word: "projekt", gender: "masculine" },
-            { word: "rádio", gender: "neuter" },
-            { word: "recepcia", gender: "feminine" },
-            { word: "reštaurácia", gender: "feminine" },
-            { word: "sekunda", gender: "feminine" },
-            { word: "sezóna", gender: "feminine" },
-            { word: "šéf", gender: "masculine" },
-            { word: "šéfka", gender: "feminine" },
-            { word: "štadión", gender: "masculine" },
-            { word: "študent", gender: "masculine" },
-            { word: "študentka", gender: "feminine" },
-            { word: "taxík", gender: "masculine" },
-            { word: "telefón", gender: "masculine" },
-            { word: "televízia", gender: "feminine" },
-            { word: "tréning", gender: "masculine" },
-            { word: "univerzita", gender: "feminine" },
-            { word: "víkend", gender: "masculine" },
-            { word: "slovenčina", gender: "feminine" },
-            { word: "jablko", gender: "neuter" },
-            { word: "voda", gender: "feminine" },
-            { word: "tričko", gender: "neuter" },
-            { word: "čaj", gender: "masculine" }
+            { word: "autobus", type: "masculine-inanimate" },
+            { word: "adresa", type: "feminine" },
+            { word: "auto", type: "neuter" },
+            { word: "banka", type: "feminine" },
+            { word: "Carlo", type: "masculine-animate" },
+            { word: "centrum", type: "neuter" },
+            { word: "cigareta", type: "feminine" },
+            { word: "číslo", type: "neuter" },
+            { word: "doktor", type: "masculine-animate" },
+            { word: "doktorka", type: "feminine" },
+            { word: "efekt", type: "masculine-inanimate" },
+            { word: "futbalista", type: "masculine-animate" },
+            { word: "gitara", type: "feminine" },
+            { word: "gramatika", type: "feminine" },
+            { word: "hotel", type: "masculine-inanimate" },
+            { word: "charakter", type: "masculine-inanimate" },
+            { word: "inštitúcia", type: "feminine" },
+            { word: "inštitút", type: "masculine-inanimate" },
+            { word: "izba", type: "feminine" },
+            { word: "kino", type: "neuter" },
+            { word: "kľúč", type: "masculine-inanimate" },
+            { word: "koncert", type: "masculine-inanimate" },
+            { word: "lektor", type: "masculine-animate" },
+            { word: "lektorka", type: "feminine" },
+            { word: "mapa", type: "feminine" },
+            { word: "minúta", type: "feminine" },
+            { word: "mobil", type: "masculine-inanimate" },
+            { word: "Nemecko", type: "neuter" },
+            { word: "objekt", type: "masculine-inanimate" },
+            { word: "politika", type: "feminine" },
+            { word: "pošta", type: "feminine" },
+            { word: "problém", type: "masculine-inanimate" },
+            { word: "proces", type: "masculine-inanimate" },
+            { word: "profesor", type: "masculine-animate" },
+            { word: "profesorka", type: "feminine" },
+            { word: "projekt", type: "masculine-inanimate" },
+            { word: "rádio", type: "neuter" },
+            { word: "recepcia", type: "feminine" },
+            { word: "reštaurácia", type: "feminine" },
+            { word: "sekunda", type: "feminine" },
+            { word: "sezóna", type: "feminine" },
+            { word: "šéf", type: "masculine-animate" },
+            { word: "šéfka", type: "feminine" },
+            { word: "štadión", type: "masculine-inanimate" },
+            { word: "študent", type: "masculine-animate" },
+            { word: "študentka", type: "feminine" },
+            { word: "taxík", type: "masculine-inanimate" },
+            { word: "telefón", type: "masculine-inanimate" },
+            { word: "televízia", type: "feminine" },
+            { word: "tréning", type: "masculine-inanimate" },
+            { word: "univerzita", type: "feminine" },
+            { word: "víkend", type: "masculine-inanimate" },
+            { word: "slovenčina", type: "feminine" },
+            { word: "jablko", type: "neuter" },
+            { word: "voda", type: "feminine" },
+            { word: "tričko", type: "neuter" },
+            { word: "čaj", type: "masculine-inanimate" }
         ];
 
-        // Map for quick gender lookup
-        const nounGenderMap = new Map(nouns.map(item => [item.word, item.gender]));
+        // Map for quick type lookup
+        const nounTypeMap = new Map(nouns.map(item => [item.word, item.type]));
 
         // DOM elements
         const wordList = document.getElementById('word-list');
-        const dropZones = document.querySelectorAll('[data-gender]');
+        const dropZones = document.querySelectorAll('[data-type]');
         const checkButton = document.getElementById('check-button');
         const resetButton = document.getElementById('reset-button');
         const feedbackMessage = document.getElementById('feedback-message');
@@ -232,15 +241,15 @@
 
             // Check each column
             dropZones.forEach(zone => {
-                const gender = zone.dataset.gender;
+                const type = zone.dataset.type;
                 const itemsInColumn = zone.querySelectorAll('.drag-item');
                 totalWords += itemsInColumn.length;
                 
                 itemsInColumn.forEach(item => {
                     const word = item.dataset.word;
-                    const correctGender = nounGenderMap.get(word);
+                    const correctType = nounTypeMap.get(word);
                     
-                    if (correctGender === gender) {
+                    if (correctType === type) {
                         item.classList.add('bg-green-500', 'text-white');
                         correctCount++;
                     } else {
@@ -261,15 +270,16 @@
 
         // --- Reset function ---
         resetButton.addEventListener('click', () => {
-            const allWords = document.querySelectorAll('.drag-item');
-            allWords.forEach(item => {
-                wordList.appendChild(item);
-                item.classList.remove('bg-green-500', 'bg-red-500', 'text-white');
+            // Clear drop zones
+            dropZones.forEach(zone => {
+                zone.querySelector('div').innerHTML = '';
             });
+
+            // Reset feedback message
             feedbackMessage.textContent = '';
             feedbackMessage.classList.remove('text-green-600', 'text-red-600');
             
-            // Re-create words to shuffle their initial order
+            // Re-create words to shuffle their initial order in the top container
             createWordElements();
         });
 
@@ -278,3 +288,5 @@
     </script>
 </body>
 </html>
+
+

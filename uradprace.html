@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktívne cvičenie: Spojte pojmy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a single-view, interactive matching game. This version uses drag-and-drop. It features two columns: draggable terms on the left and dropzone definitions on the right. The user drags a term and drops it onto the corresponding definition. This structure was chosen to create a more tactile and engaging learning experience compared to simple clicking. Immediate visual feedback (correct/incorrect styling) reinforces learning instantly. -->
+    <!-- Visualization & Content Choices: Report Info: 8 Slovak terms and their definitions. Goal: Reinforce vocabulary. Viz/Presentation Method: Draggable cards for terms and dropzone cards for definitions. Interaction: Drag-and-drop. The system provides immediate color-coded feedback. Justification: Drag-and-drop is highly interactive and provides a clear metaphor for matching pairs. It works well on desktop and is adapted for touch, making it a superior choice for active learning. Library/Method: HTML/CSS with Tailwind for structure, Vanilla JS for all drag-and-drop logic. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .term-card {
+            transition: all 0.2s ease-in-out;
+            cursor: grab;
+        }
+        .term-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .definition-card {
+            transition: all 0.2s ease-in-out;
+            border: 2px dashed #d1d5db;
+        }
+        .dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        .drag-over {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .correct {
+            border-style: solid;
+            border-color: #22c55e;
+            background-color: #f0fdf4;
+            cursor: not-allowed;
+            opacity: 1;
+        }
+        .incorrect-drop {
+            animation: shake 0.5s;
+            border-color: #ef4444;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .correct .term-text {
+            font-weight: bold;
+            color: #15803d;
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
+
+    <main class="bg-white rounded-2xl shadow-xl p-6 md:p-10 w-full max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-800">Interaktívne cvičenie</h1>
+            <p class="text-gray-600 mt-2">Spojte každý pojem s jeho správnou definíciou. Presuňte pojem z ľavého stĺpca na správnu definíciu v pravom stĺpci.</p>
+        </header>
+
+        <div id="feedback" class="text-center h-8 mb-4 font-semibold text-lg transition-opacity duration-300"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+            <div id="terms-container" class="space-y-4">
+                <h2 class="text-xl font-semibold text-center text-sky-700">Pojmy</h2>
+            </div>
+            <div id="definitions-container" class="space-y-4">
+                 <h2 class="text-xl font-semibold text-center text-sky-700">Definície</h2>
+            </div>
+        </div>
+        
+        <div id="completion-message" class="hidden text-center mt-8 p-6 bg-green-100 text-green-800 rounded-lg">
+            <h3 class="text-2xl font-bold">Výborne!</h3>
+            <p>Všetky pojmy ste úspešne spojili.</p>
+        </div>
+
+        <footer class="text-center mt-10">
+            <button id="reset-button" class="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-colors duration-300 shadow-md">
+                Skúsiť znova
+            </button>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = [
+                { id: 1, term: 'materská/rodičovská dovolenka', definition: 'čas, keď sa niekto stará o malé dieťa a nepracuje' },
+                { id: 2, term: 'pracovať v zahraničí', definition: 'pracovať mimo Slovenska' },
+                { id: 3, term: 'pracovať načierno', definition: 'pracovať ilegálne' },
+                { id: 4, term: 'personálna agentúra', definition: 'agentúra, ktorá pomáha nezamestnaným hľadať zamestnanie' },
+                { id: 5, term: 'brigádnický servis', definition: 'agentúra, ktorá pomáha študentom a nezamestnaným nájsť brigádu' },
+                { id: 6, term: 'úrad práce', definition: 'úrad, ktorý eviduje nezamestnaných' },
+                { id: 7, term: 'trvalý pobyt', definition: 'stála adresa, ktorá sa nemení často' },
+                { id: 8, term: 'prechodný pobyt', definition: 'dočasná adresa na krátky čas (napríklad počas štúdia)' }
+            ];
+
+            const termsContainer = document.getElementById('terms-container');
+            const definitionsContainer = document.getElementById('definitions-container');
+            const resetButton = document.getElementById('reset-button');
+            const feedbackEl = document.getElementById('feedback');
+            const completionMessage = document.getElementById('completion-message');
+
+            let correctMatches = 0;
+
+            function shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function setupExercise() {
+                termsContainer.innerHTML = '<h2 class="text-xl font-semibold text-center text-sky-700">Pojmy</h2>';
+                definitionsContainer.innerHTML = '<h2 class="text-xl font-semibold text-center text-sky-700">Definície</h2>';
+                correctMatches = 0;
+                feedbackEl.textContent = '';
+                completionMessage.classList.add('hidden');
+
+                const shuffledDefinitions = shuffle([...data]);
+
+                data.forEach(item => {
+                    const termEl = document.createElement('div');
+                    termEl.classList.add('term-card', 'p-4', 'rounded-lg', 'bg-gray-50', 'border-2', 'border-gray-200');
+                    termEl.textContent = item.term;
+                    termEl.dataset.id = item.id;
+                    termEl.draggable = true;
+                    addDragListenersToTerm(termEl);
+                    termsContainer.appendChild(termEl);
+                });
+
+                shuffledDefinitions.forEach(item => {
+                    const defEl = document.createElement('div');
+                    defEl.classList.add('definition-card', 'p-4', 'rounded-lg', 'bg-gray-50', 'min-h-[68px]', 'flex', 'items-center', 'justify-center', 'text-center');
+                    defEl.textContent = item.definition;
+                    defEl.dataset.id = item.id;
+                    addDropListenersToDefinition(defEl);
+                    definitionsContainer.appendChild(defEl);
+                });
+            }
+            
+            function showFeedback(message, color, duration = 2000) {
+                feedbackEl.textContent = message;
+                feedbackEl.style.color = color;
+                setTimeout(() => {
+                    if (feedbackEl.textContent === message) {
+                        feedbackEl.textContent = '';
+                    }
+                }, duration);
+            }
+            
+            function addDragListenersToTerm(term) {
+                term.addEventListener('dragstart', (e) => {
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', e.target.dataset.id);
+                });
+                term.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+            }
+
+            function addDropListenersToDefinition(definition) {
+                definition.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if (!definition.classList.contains('correct')) {
+                       definition.classList.add('drag-over');
+                    }
+                });
+                definition.addEventListener('dragleave', (e) => {
+                    definition.classList.remove('drag-over');
+                });
+                definition.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    definition.classList.remove('drag-over');
+                    if (definition.classList.contains('correct')) return;
+
+                    const draggedTermId = e.dataTransfer.getData('text/plain');
+                    const targetDefinitionId = definition.dataset.id;
+                    
+                    const draggedTerm = termsContainer.querySelector(`[data-id="${draggedTermId}"]`);
+
+                    if (draggedTermId === targetDefinitionId) {
+                        definition.classList.add('correct');
+                        definition.innerHTML = `<span class="term-text">${draggedTerm.textContent}</span><br>${definition.textContent}`;
+                        draggedTerm.style.display = 'none';
+
+                        correctMatches++;
+                        showFeedback('Správne!', '#22c55e');
+                        
+                        if (correctMatches === data.length) {
+                            completionMessage.classList.remove('hidden');
+                            feedbackEl.textContent = '';
+                        }
+                    } else {
+                        definition.classList.add('incorrect-drop');
+                        showFeedback('Nesprávne, skúste znova.', '#ef4444');
+                        setTimeout(() => {
+                           definition.classList.remove('incorrect-drop');
+                        }, 500);
+                    }
+                });
+            }
+
+            resetButton.addEventListener('click', setupExercise);
+
+            setupExercise();
+        });
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,284 @@
+{
+  "questions": [
+    {
+      "questionNumber": 1,
+      "question": "Оберіть правильну форму множини для слова **sveter** (светр).",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "svetre",
+          "rationale": "Правильно. У слові **sveter** при відмінюванні випадає голосна -e- (bez svetra), тому воно належить до типу **počitač** і має закінчення **-e**.",
+          "isCorrect": true
+        },
+        {
+          "text": "svetery",
+          "rationale": "Неправильно. Оскільки -e- у слові випадає (svetra), воно не може належати до типу **plan** (як server).",
+          "isCorrect": false
+        },
+        {
+          "text": "svetri",
+          "rationale": "Неправильно. Закінчення -i (м'яке і) не характерне для називного відмінка множини цих типів.",
+          "isCorrect": false
+        },
+        {
+          "text": "svetrov",
+          "rationale": "Це форма родового відмінка множини (genitív), а не називного.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Перевірте, чи зникає літера 'e' у родовому відмінку (od koho/čoho? - od svetra)."
+    },
+    {
+      "questionNumber": 2,
+      "question": "Оберіть правильну форму множини для слова **server**.",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "servery",
+          "rationale": "Правильно. У слові **server** голосна -e- зберігається (od servera), тому це тип **plan** із закінченням **-y**.",
+          "isCorrect": true
+        },
+        {
+          "text": "servere",
+          "rationale": "Неправильно. Ця форма була б правильною для типу **počitač**, але тут -e- не випадає.",
+          "isCorrect": false
+        },
+        {
+          "text": "serveri",
+          "rationale": "Неправильно. Це закінчення використовується для живих істот (chlapci) або в інших відмінках.",
+          "isCorrect": false
+        },
+        {
+          "text": "servre",
+          "rationale": "Неправильно. У цьому слові основа не скорочується.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Чи залишається літера 'e' в основі слова, коли ми його відмінюємо (bez servera)?"
+    },
+    {
+      "questionNumber": 3,
+      "question": "Як правильно утворити множину для слова **teplomer** (термометр)?",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "teplomere",
+          "rationale": "Неправильно. Хоча це слово закінчується на -er, воно є винятком.",
+          "isCorrect": false
+        },
+        {
+          "text": "teplomery",
+          "rationale": "Правильно. Це складне слово, похідне від дієслова **merať**. Такі слова завжди належать до типу **plan**.",
+          "isCorrect": true
+        },
+        {
+          "text": "teplomre",
+          "rationale": "Неправильно. Випадіння голосної тут не відбувається.",
+          "isCorrect": false
+        },
+        {
+          "text": "teplomera",
+          "rationale": "Це форма родового відмінка однини.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Це складне слово, друга частина якого походить від дієслова 'merať' (міряти)."
+    },
+    {
+      "questionNumber": 4,
+      "question": "Оберіть множину для слова **papier** (папір).",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "papiery",
+          "rationale": "Неправильно. Дифтонг -ie- вказує на м'якість.",
+          "isCorrect": false
+        },
+        {
+          "text": "papiere",
+          "rationale": "Правильно. Слова із суфіксом **-ier** належать до типу **počitač** і мають закінчення **-e**.",
+          "isCorrect": true
+        },
+        {
+          "text": "papieri",
+          "rationale": "Неправильно. Такого закінчення в називному відмінку немає.",
+          "isCorrect": false
+        },
+        {
+          "text": "papíre",
+          "rationale": "Неправильно. Довге í тут не вживається.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Зверніть увагу на дифтонг 'ie' перед кінцевим 'r'."
+    },
+    {
+      "questionNumber": 5,
+      "question": "Яка правильна форма множини для слова **kanál**?",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "kanále",
+          "rationale": "Неправильно. Це поширена помилка через м'якість у місцевому відмінку (v kanáli).",
+          "isCorrect": false
+        },
+        {
+          "text": "kanály",
+          "rationale": "Правильно. Слова на **-ál** у множині завжди тверді і належать до типу **plan**.",
+          "isCorrect": true
+        },
+        {
+          "text": "kanáli",
+          "rationale": "Це форма місцевого відмінка однини (v kanáli), а не множини.",
+          "isCorrect": false
+        },
+        {
+          "text": "kanálov",
+          "rationale": "Це родовий відмінок множини.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Слова з суфіксом -ál належать до твердого типу в множині."
+    },
+    {
+      "questionNumber": 6,
+      "question": "Оберіть множину для слова **pohár** (склянка).",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "poháre",
+          "rationale": "Правильно. Слова на **-ár** завжди належать до типу **počitač** (-e).",
+          "isCorrect": true
+        },
+        {
+          "text": "poháry",
+          "rationale": "Неправильно. Суфікс -ár вимагає м'якого закінчення.",
+          "isCorrect": false
+        },
+        {
+          "text": "pohári",
+          "rationale": "Неправильно. Це закінчення не підходить для неістот.",
+          "isCorrect": false
+        },
+        {
+          "text": "pohre",
+          "rationale": "Неправильно. Скорочення кореня тут не відбувається.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Суфікс -ár завжди вказує на одну конкретну групу відмінювання."
+    },
+    {
+      "questionNumber": 7,
+      "question": "Оберіть правильну форму множини для слова **bar**.",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "bare",
+          "rationale": "Неправильно. Це слово іноземного походження не належить до м'якої групи.",
+          "isCorrect": false
+        },
+        {
+          "text": "bary",
+          "rationale": "Правильно. Односкладові слова іншомовного походження зазвичай належать до типу **plan**.",
+          "isCorrect": true
+        },
+        {
+          "text": "bari",
+          "rationale": "Неправильно.",
+          "isCorrect": false
+        },
+        {
+          "text": "barov",
+          "rationale": "Це родовий відмінок.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Короткі іншомовні слова зазвичай тверді."
+    },
+    {
+      "questionNumber": 8,
+      "question": "Оберіть множину для слова **filter**.",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "filtry",
+          "rationale": "Неправильно. Оскільки -e- випадає, слово переходить у м'яку групу.",
+          "isCorrect": false
+        },
+        {
+          "text": "filtre",
+          "rationale": "Правильно. При відмінюванні -e- випадає (filtra), отже це тип **počitač**.",
+          "isCorrect": true
+        },
+        {
+          "text": "filtery",
+          "rationale": "Неправильно. Не можна залишати -e- і додавати тверде закінчення, якщо воно має випадати.",
+          "isCorrect": false
+        },
+        {
+          "text": "filtrí",
+          "rationale": "Неправильно.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Що відбувається з літерою 'e' в слові 'filter', коли ми кажемо 'bez filtra'?"
+    },
+    {
+      "questionNumber": 9,
+      "question": "Яка правильна форма множини для слова **terminál**?",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "terminále",
+          "rationale": "Неправильно. Суфікс -ál у множині твердий.",
+          "isCorrect": false
+        },
+        {
+          "text": "terminály",
+          "rationale": "Правильно. Суфікс **-ál** вказує на тип **plan** (твердий).",
+          "isCorrect": true
+        },
+        {
+          "text": "termináli",
+          "rationale": "Це місцевий відмінок однини.",
+          "isCorrect": false
+        },
+        {
+          "text": "terminálov",
+          "rationale": "Це родовий відмінок.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Правило для слів на -ál таке саме, як і для слова 'kanál'."
+    },
+    {
+      "questionNumber": 10,
+      "question": "Оберіть правильну форму множини для слова **kontajner**.",
+      "imageUrl": null,
+      "answerOptions": [
+        {
+          "text": "kontajnery",
+          "rationale": "Правильно. Голосна -e- зберігається (kontajnera), тому це тип **plan**.",
+          "isCorrect": true
+        },
+        {
+          "text": "kontajnere",
+          "rationale": "Неправильно. Це було б вірно, якби -e- випадало, але воно залишається.",
+          "isCorrect": false
+        },
+        {
+          "text": "kontajnre",
+          "rationale": "Неправильно. Випадіння голосної тут не відбувається.",
+          "isCorrect": false
+        },
+        {
+          "text": "kontajneri",
+          "rationale": "Неправильно.",
+          "isCorrect": false
+        }
+      ],
+      "hint": "Перевірте, чи випадає 'e' (bez kontajnera?)."
+    }
+  ]
+}

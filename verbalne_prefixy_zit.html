@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verbálne prefixy — žiť</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Georgia,'Times New Roman',serif;background:#f7f4ef;color:#2a2520;line-height:1.6;padding:2rem 1rem}
+  .page{max-width:720px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid #ddd8d0;padding:2.5rem 2.5rem 3rem}
+
+  /* Header */
+  .ws-header{border-bottom:1.5px solid #d4cec5;padding-bottom:1.25rem;margin-bottom:2rem}
+  .ws-title{font-size:26px;font-weight:700;letter-spacing:-.01em;margin-bottom:.4rem;color:#1e1a16}
+  .ws-title em{font-style:italic;color:#5a4e3a}
+  .ws-sub{font-size:13.5px;color:#6b6357;line-height:1.65}
+  .ws-sub em{font-style:italic}
+
+  /* Section labels */
+  .section-label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;color:#a0968a;text-transform:uppercase;margin-bottom:.75rem;margin-top:2rem}
+
+  /* ŽIŤ base card */
+  .zit-card{background:#faf7f2;border-radius:10px;border:1px solid #e5dfd5;padding:1.25rem 1.5rem;margin-bottom:1.5rem}
+  .zit-header{display:flex;align-items:baseline;gap:10px;margin-bottom:1rem}
+  .zit-word{font-size:22px;font-weight:700;color:#1e1a16}
+  .zit-tag{font-size:11px;background:#ede8e0;border:1px solid #d4cec5;border-radius:5px;padding:2px 8px;color:#6b6357;font-family:Arial,sans-serif}
+  .meaning-list{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .meaning-item{font-size:14px;line-height:1.6;display:grid;grid-template-columns:20px 1fr;gap:4px}
+  .m-num{font-size:11.5px;color:#a0968a;padding-top:2px;font-family:Arial,sans-serif}
+  .m-def{color:#2a2520}
+  .m-ex{font-size:12.5px;color:#7a7068;font-style:italic}
+  .phrase-block{margin-top:1rem;padding-top:1rem;border-top:1px solid #e5dfd5}
+  .phrase-label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.1em;color:#a0968a;text-transform:uppercase;margin-bottom:5px}
+  .phrase-item{font-size:13px;color:#2a2520;line-height:1.9}
+  .phrase-item span{font-style:italic}
+
+  /* Prefix cards */
+  .prefix-card{border:1px solid #e0d9d0;border-radius:10px;overflow:hidden;background:#fff;margin-bottom:8px}
+  .prefix-head{display:flex;align-items:center;justify-content:space-between;padding:.8rem 1.25rem;cursor:pointer;user-select:none;transition:background .15s}
+  .prefix-head:hover{background:#faf7f2}
+  .prefix-left{display:flex;align-items:baseline;gap:12px}
+  .prefix-badge{font-size:15px;font-weight:700;color:#3a3028;font-family:Arial,sans-serif;min-width:52px}
+  .prefix-verbs{font-size:12.5px;color:#7a7068;font-style:italic}
+  .prefix-arrow{font-size:11px;color:#a0968a;transition:transform .2s;font-family:Arial,sans-serif}
+  .prefix-arrow.open{transform:rotate(90deg)}
+  .prefix-body{padding:0 1.25rem 1.1rem;display:none;border-top:1px solid #ede8e0}
+  .prefix-body.open{display:block}
+  .sub-verb{margin-top:.85rem}
+  .sub-verb-title{font-size:13px;font-weight:700;color:#4a4038;margin-bottom:4px}
+  .sub-verb-title span{font-weight:400;color:#8a8078}
+  .sub-meanings{list-style:none;display:flex;flex-direction:column;gap:4px}
+  .sub-m{font-size:13px;line-height:1.6;display:grid;grid-template-columns:18px 1fr;gap:4px}
+  .sub-m-num{font-size:11px;color:#a0968a;padding-top:2px;font-family:Arial,sans-serif}
+  .sub-ex{font-size:12px;color:#7a7068;font-style:italic}
+  .book-note{font-size:11px;color:#a0968a;margin-left:4px}
+
+  /* Exercises */
+  .ex-card{border:1px solid #e0d9d0;border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:10px;background:#fff}
+  .ex-title{font-size:15px;font-weight:700;color:#1e1a16;margin-bottom:.25rem;font-family:Arial,sans-serif}
+  .ex-desc{font-size:13px;color:#7a7068;margin-bottom:1.1rem;line-height:1.55}
+
+  /* Match exercise */
+  .match-container{display:flex;gap:1rem}
+  .match-col{flex:1;display:flex;flex-direction:column;gap:6px}
+  .match-col-label{font-family:Arial,sans-serif;font-size:10px;font-weight:700;color:#a0968a;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+  .match-item{font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid #ddd8d0;cursor:pointer;background:#faf7f2;line-height:1.45;transition:background .12s,border-color .12s}
+  .match-item:hover{border-color:#b0a898}
+  .match-item.selected{background:#e8f0fc;border-color:#7a9fd4;color:#1a3a6b}
+  .match-item.correct{background:#eaf5ee;border-color:#6db88a;color:#1a5030;cursor:default}
+  .match-item.wrong{background:#fceaea;border-color:#d47a7a;color:#5a1a1a}
+
+  /* Fill exercise */
+  .fill-item{margin-bottom:.85rem;font-size:14px;line-height:1.7}
+  select{font-size:13px;padding:3px 6px;border-radius:5px;border:1px solid #c8c0b5;background:#faf7f2;color:#2a2520;margin:0 3px;cursor:pointer;font-family:Georgia,serif}
+  select.correct{border-color:#6db88a;background:#eaf5ee;color:#1a5030}
+  select.wrong{border-color:#d47a7a;background:#fceaea;color:#5a1a1a}
+
+  /* Reflect exercise */
+  .diff-q{font-size:14px;margin-bottom:.6rem;line-height:1.65;color:#2a2520}
+  .diff-q em{color:#5a4e3a}
+  .diff-ans{display:none;margin-top:.4rem;margin-bottom:1rem;border:1px solid #e0d9d0;border-radius:8px;padding:.8rem 1rem;background:#faf7f2;font-size:13.5px;line-height:1.65;color:#3a3028}
+  .diff-ans.open{display:block}
+  .diff-ans strong{color:#1e1a16}
+
+  /* Buttons */
+  button{font-family:Arial,sans-serif;font-size:12.5px;padding:5px 14px;border-radius:6px;border:1px solid #c8c0b5;background:#faf7f2;color:#3a3028;cursor:pointer;transition:background .12s}
+  button:hover{background:#ede8e0}
+  button.show-btn{margin-top:0;margin-bottom:.5rem}
+
+  .score{font-family:Arial,sans-serif;font-size:12.5px;color:#6b6357;margin-top:10px}
+  .score strong{color:#2a2520}
+
+  @media(max-width:560px){
+    .page{padding:1.5rem 1.25rem 2rem}
+    .match-container{flex-direction:column}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .page{border:none;border-radius:0;padding:1.5rem}
+    button{display:none}
+    .prefix-body{display:block!important}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="ws-header">
+  <div class="ws-title">Verbálne prefixy — <em>žiť</em></div>
+  <div class="ws-sub">Pomocou prefixov (pre-, za-, do-, o-, v-, u-, po-, z-, vy-) vytvárame z imperfektívneho slovesa <em>žiť</em> viaceré perfektívne slovesá s novým alebo pozmeneným významom. Niekedy sa postup rozširuje o komponent <em>sa / si</em>, napr. <em>žiť → dožiť sa</em>. Tieto perfektívne slovesá potom vytvárajú svoju aspektovú dvojicu sufixáciou, napr. <em>prežiť – prežívať, dožiť sa – dožívať sa</em>.</div>
+</div>
+
+<div class="section-label">Základné sloveso</div>
+<div class="zit-card">
+  <div class="zit-header">
+    <div class="zit-word">žiť</div>
+    <div class="zit-tag">Vimp</div>
+  </div>
+  <ul class="meaning-list">
+    <li class="meaning-item"><span class="m-num">1.</span><div><div class="m-def">byť živý</div><div class="m-ex">ž. dlho, krátko, 70 rokov</div></div></li>
+    <li class="meaning-item"><span class="m-num">2.</span><div><div class="m-def">byť, jestvovať</div><div class="m-ex">žil raz jeden kráľ</div></div></li>
+    <li class="meaning-item"><span class="m-num">3.</span><div><div class="m-def">bývať</div><div class="m-ex">ž. v meste, na dedine</div></div></li>
+    <li class="meaning-item"><span class="m-num">4.</span><div><div class="m-def">tráviť život istým spôsobom</div><div class="m-ex">ž. skromne</div></div></li>
+    <li class="meaning-item"><span class="m-num">5.</span><div><div class="m-def">byť v nejakom duševnom stave</div><div class="m-ex">ž. v strachu, v očakávaní, že...</div></div></li>
+    <li class="meaning-item"><span class="m-num">6.</span><div><div class="m-def">nachádzať sa v istých zväzkoch</div><div class="m-ex">ž. spolu 20 rokov, ž. so ženou</div></div></li>
+    <li class="meaning-item"><span class="m-num">7.</span><div><div class="m-def">zacieľovať svoje konanie</div><div class="m-ex">ž. pre deti</div></div></li>
+    <li class="meaning-item"><span class="m-num">8.</span><div><div class="m-def">byť zaujatý niečím</div><div class="m-ex">mesto žilo hudbou</div></div></li>
+    <li class="meaning-item"><span class="m-num">9.</span><div><div class="m-def">živiť sa</div><div class="m-ex">ž. z vlastnej práce, ž. za cudzie peniaze</div></div></li>
+  </ul>
+  <div class="phrase-block">
+    <div class="phrase-label">Frázy</div>
+    <div class="phrase-item"><span>Nech žije oslavenec!</span></div>
+  </div>
+  <div class="phrase-block">
+    <div class="phrase-label">Frazeologizmy</div>
+    <div class="phrase-item"><span>žiť na vysokej nohe / ako gróf</span></div>
+    <div class="phrase-item"><span>žiť z ruky do úst / zo dňa na deň</span></div>
+    <div class="phrase-item"><span>žiť ako hrdličky / ako pes s mačkou</span></div>
+  </div>
+</div>
+
+<div class="section-label">Prefigované slovesá — kliknite na prefix</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">PRE-</span><span class="prefix-verbs">prežiť · prežiť sa</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">prežiť (Vp) <span>– prežívať (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>stráviť isté obdobie</div><div class="sub-ex">p. radostné detstvo, p. peknú dovolenku</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>zažiť, zakúsiť</div><div class="sub-ex">p. sklamanie v láske, p. šťastie</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">3.</span><div><div>ostať nažive dlhšie ako iní</div><div class="sub-ex">p. svojich rodičov</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">4.</span><div><div>prekonať živý</div><div class="sub-ex">p. autonehodu, p. bez jedla</div></div></li>
+      </ul>
+    </div>
+    <div class="sub-verb">
+      <div class="sub-verb-title">prežiť sa (Vp) <span>– prežívať sa (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">—</span><div><div>stať sa nemoderným</div><div class="sub-ex">táto móda sa už p-la</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">ZA-</span><span class="prefix-verbs">zažiť</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">zažiť (Vp) <span>– zažívať (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>byť účastníkom alebo svedkom niečoho</div><div class="sub-ex">z. veľa veselých príhod, z. výlet loďou, z. pád komunizmu</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>prežiť, zakúsiť</div><div class="sub-ex">z. biedu, z. strach</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">DO-</span><span class="prefix-verbs">dožiť · dožiť sa</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">dožiť (Vp) <span>– dožívať (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">—</span><div><div>skončiť život</div><div class="sub-ex">d. život v pokoji</div></div></li>
+      </ul>
+    </div>
+    <div class="sub-verb">
+      <div class="sub-verb-title">dožiť sa (Vp) <span>– dožívať sa (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>žitím dosiahnuť</div><div class="sub-ex">d. sa vysokého veku, vnúčat</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>zažiť, dočkať sa</div><div class="sub-ex">d. sa sklamania, prekvapenia</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">O-</span><span class="prefix-verbs">ožiť</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">ožiť (Vp) <span>– ožívať (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>nadobudnúť znova život</div><div class="sub-ex">chorý po lieku ožil, mŕtvy už neožije</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>obnoviť sa</div><div class="sub-ex">spomienky ožili</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">3.</span><div><div>stať sa aktívnym</div><div class="sub-ex">mesto ožilo, oči mu ožili nadšením</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">V-SA</span><span class="prefix-verbs">vžiť sa</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">vžiť sa (Vp) <span>– vžívať sa (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>žitím sa prispôsobiť</div><div class="sub-ex">v. sa do nových pomerov, v. do novej situácie</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>vcítiť sa</div><div class="sub-ex">v. sa do jeho situácie, v. sa jej kože</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">3.</span><div><div>vojsť do života (stať sa bežným)</div><div class="sub-ex">reforma sa vžila rýchlo, vžité pravidlá</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">U-</span><span class="prefix-verbs">užiť · užiť si</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">užiť (Vp) <span>– užívať (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>prijať do tela</div><div class="sub-ex">u. lieky, u. drogy</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>(iba Vimp) používať vec, kt. nie je vlastníctvom</div><div class="sub-ex">právo na u-nie bytu</div></div></li>
+      </ul>
+    </div>
+    <div class="sub-verb">
+      <div class="sub-verb-title">užiť si (Vp) <span>– užívať si (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>prežiť vo veľkej miere</div><div class="sub-ex">u. si v živote veľa biedy, radosti</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>zažiť radosť z niečoho</div><div class="sub-ex">cez prázdniny si u-li slnka, mora</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">3.</span><div><div>príjemne stráviť čas</div><div class="sub-ex">u. si s rodičmi, užiť si cez dovolenku</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">PO-</span><span class="prefix-verbs">požiť · požiť si</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">požiť (Vp) <span>– požívať (Vimp)</span> <span class="book-note">(kniž.)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>zjesť alebo vypiť</div><div class="sub-ex">p. alkohol, p. jed</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>(iba Vimp) mať a užívať</div><div class="sub-ex">p. práva a výhody</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">3.</span><div><div>tešiť sa niečomu</div><div class="sub-ex">p. úctu, dôveru</div></div></li>
+      </ul>
+    </div>
+    <div class="sub-verb">
+      <div class="sub-verb-title">požiť si (Vp) <span>– /</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">—</span><div><div>istý čas žiť</div><div class="sub-ex">mohol si ešte p.</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">Z-SA</span><span class="prefix-verbs">zžiť sa</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">zžiť sa (Vp) <span>– zžívať sa (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">—</span><div><div>dlhším spolužitím sa prispôsobiť</div><div class="sub-ex">z. sa s novým prostredím, z. sa s kolektívom</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="prefix-card">
+  <div class="prefix-head" onclick="toggle(this)">
+    <div class="prefix-left"><span class="prefix-badge">VY-</span><span class="prefix-verbs">vyžiť · vyžiť sa</span></div>
+    <span class="prefix-arrow">▶</span>
+  </div>
+  <div class="prefix-body">
+    <div class="sub-verb">
+      <div class="sub-verb-title">vyžiť (Vp) <span>– /</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">—</span><div><div>mať dosť životných potrieb</div><div class="sub-ex">v. z mála, v. z jedného platu</div></div></li>
+      </ul>
+    </div>
+    <div class="sub-verb">
+      <div class="sub-verb-title">vyžiť sa (Vp) <span>– vyžívať sa (Vimp)</span></div>
+      <ul class="sub-meanings">
+        <li class="sub-m"><span class="sub-m-num">1.</span><div><div>realizovať sa</div><div class="sub-ex">spoločensky, športovo sa v., možnosť kultúrneho v-tia</div></div></li>
+        <li class="sub-m"><span class="sub-m-num">2.</span><div><div>(iba Vimp) zlomyseľne sa tešiť z niečoho</div><div class="sub-ex">v-l sa na jej hanbe</div></div></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="section-label" style="margin-top:2.5rem">Cvičenia</div>
+
+<!-- Exercise 1 -->
+<div class="ex-card">
+  <div class="ex-title">Cvičenie 1 — Priradenie</div>
+  <div class="ex-desc">Priraďte každé sloveso k jeho základnému významu. Kliknite najprv na sloveso, potom na správnu definíciu.</div>
+  <div class="match-container">
+    <div class="match-col">
+      <div class="match-col-label">Slovesá</div>
+      <div class="match-item" data-word="ožiť" onclick="selectWord(this)">ožiť</div>
+      <div class="match-item" data-word="prežiť" onclick="selectWord(this)">prežiť</div>
+      <div class="match-item" data-word="dožiť sa" onclick="selectWord(this)">dožiť sa</div>
+      <div class="match-item" data-word="vyžiť" onclick="selectWord(this)">vyžiť</div>
+      <div class="match-item" data-word="vžiť sa" onclick="selectWord(this)">vžiť sa</div>
+      <div class="match-item" data-word="zžiť sa" onclick="selectWord(this)">zžiť sa</div>
+      <div class="match-item" data-word="užiť si" onclick="selectWord(this)">užiť si</div>
+      <div class="match-item" data-word="zažiť" onclick="selectWord(this)">zažiť</div>
+    </div>
+    <div class="match-col">
+      <div class="match-col-label">Definície</div>
+      <div class="match-item" data-def="prežiť" onclick="selectDef(this)">ostať nažive dlhšie ako iní</div>
+      <div class="match-item" data-def="vyžiť" onclick="selectDef(this)">vystaviť si z príjmu na základné potreby</div>
+      <div class="match-item" data-def="zažiť" onclick="selectDef(this)">byť priamym účastníkom alebo svedkom niečoho</div>
+      <div class="match-item" data-def="vžiť sa" onclick="selectDef(this)">prispôsobiť sa novej situácii žitím v nej</div>
+      <div class="match-item" data-def="dožiť sa" onclick="selectDef(this)">žitím dosiahnuť nejaký vek alebo udalosť</div>
+      <div class="match-item" data-def="zžiť sa" onclick="selectDef(this)">dlhším spolužitím si zvyknúť na prostredie</div>
+      <div class="match-item" data-def="užiť si" onclick="selectDef(this)">príjemne stráviť čas</div>
+      <div class="match-item" data-def="ožiť" onclick="selectDef(this)">nadobudnúť znova život alebo aktivitu</div>
+    </div>
+  </div>
+  <div class="score" id="match-score"></div>
+</div>
+
+<!-- Exercise 2 -->
+<div class="ex-card">
+  <div class="ex-title">Cvičenie 2 — Doplňte správne sloveso</div>
+  <div class="ex-desc">Vyberte správny tvar slovesa z ponuky. Odpoveď sa skontroluje hneď po výbere.</div>
+
+  <div class="fill-item">1. Po dlhej chorobe sa pacient nakoniec
+    <select id="f1" onchange="checkFill(this,'ožil')">
+      <option value="">— vybrať —</option><option>prežil</option><option>ožil</option><option>zažil</option><option>dožil</option>
+    </select>.</div>
+  <div class="fill-item">2. Ako dieťa
+    <select id="f2" onchange="checkFill(this,'prežil')">
+      <option value="">— vybrať —</option><option>prežil</option><option>požil</option><option>vyžil</option><option>zžil sa</option>
+    </select> vojnu v malej dedinke.</div>
+  <div class="fill-item">3. Babička chcela
+    <select id="f3" onchange="checkFill(this,'dožiť sa')">
+      <option value="">— vybrať —</option><option>prežiť</option><option>dožiť sa</option><option>vyžiť sa</option><option>vžiť sa</option>
+    </select> vnúčat.</div>
+  <div class="fill-item">4. Po presťahovaní sa rýchlo
+    <select id="f4" onchange="checkFill(this,'vžila sa')">
+      <option value="">— vybrať —</option><option>zžila sa</option><option>vžila sa</option><option>vyžila sa</option><option>prežila sa</option>
+    </select> do novej komunity.</div>
+  <div class="fill-item">5. Celé leto sme si
+    <select id="f5" onchange="checkFill(this,'užívali')">
+      <option value="">— vybrať —</option><option>prežívali</option><option>zažívali</option><option>užívali</option><option>požívali</option>
+    </select> pri mori.</div>
+  <div class="fill-item">6. Z jedného platu sa nedá
+    <select id="f6" onchange="checkFill(this,'vyžiť')">
+      <option value="">— vybrať —</option><option>prežiť</option><option>vyžiť</option><option>dožiť</option><option>užiť si</option>
+    </select> v tomto meste.</div>
+  <div class="fill-item">7. Po rokoch sme sa konečne
+    <select id="f7" onchange="checkFill(this,'zžili')">
+      <option value="">— vybrať —</option><option>vžili</option><option>zažili</option><option>zžili</option><option>prežili</option>
+    </select> s novými susedmi.</div>
+  <div class="fill-item">8. Herec sa vedel dokonale
+    <select id="f8" onchange="checkFill(this,'vžiť sa')">
+      <option value="">— vybrať —</option><option>zžiť sa</option><option>vžiť sa</option><option>prežiť sa</option><option>dožiť sa</option>
+    </select> do každej postavy.</div>
+  <div class="score" id="fill-score"></div>
+</div>
+
+<!-- Exercise 3 -->
+<div class="ex-card">
+  <div class="ex-title">Cvičenie 3 — Zamyslite sa</div>
+  <div class="ex-desc">Odpovedzte ústne alebo písomne. Kliknite na „Zobraziť odpoveď" pre modelové riešenie.</div>
+
+  <div class="diff-q">1. Aký je rozdiel medzi <em>prežiť biedu</em> a <em>zažiť biedu</em>? Sú tieto výrazy zameniteľné?</div>
+  <button class="show-btn" onclick="toggleAns('a1')">Zobraziť odpoveď</button>
+  <div class="diff-ans" id="a1">Obe slovesá sú v tomto kontexte <strong>takmer synonymné</strong> — obe vyjadrujú, že niekto priamo zakúsil biedu. Rozdiel je jemný: <em>prežiť</em> zdôrazňuje, že daná skúsenosť sa stala <strong>súčasťou life-story</strong> (napr. človek tým prešiel a zostal nažive alebo to prekonaní), zatiaľ čo <em>zažiť</em> kladie dôraz na <strong>priame svedectvo a zážitkovosť</strong>. V bežnej reči sú zameniteľné.</div>
+
+  <div class="diff-q" style="margin-top:1rem">2. Čím sa líši <em>vžiť sa do situácie</em> od <em>zžiť sa s prostredím</em>?</div>
+  <button class="show-btn" onclick="toggleAns('a2')">Zobraziť odpoveď</button>
+  <div class="diff-ans" id="a2"><strong>vžiť sa do situácie</strong> — ide o <strong>mentálne vcítenie sa</strong>, pochopenie cudzej perspektívy alebo rýchle prispôsobenie sa novej situácii. Môže byť krátkodobé. <br><br><strong>zžiť sa s prostredím</strong> — ide o <strong>dlhodobý proces</strong> spolužitia, po ktorom si človek zvykne na ľudí alebo miesto. Vyžaduje čas a opakovaný kontakt.</div>
+
+  <div class="diff-q" style="margin-top:1rem">3. Preložte do slovenčiny: „Keď sme sa presťahovali, trvalo nám dlho, kým sme si zvykli na nové mesto."</div>
+  <button class="show-btn" onclick="toggleAns('a3')">Zobraziť odpoveď</button>
+  <div class="diff-ans" id="a3">Najlepší preklad s prefigovaným slovesom od <em>žiť</em>:<br><br><strong>„Keď sme sa presťahovali, dlho trvalo, kým sme sa zžili s novým mestom."</strong><br><br>Možná je aj verzia: <em>„... kým sme sa vžili do nového mesta."</em> — tá je správna, ale <em>zžiť sa</em> vystihuje proces dlhodobého spolužitia presnejšie.</div>
+</div>
+
+</div>
+
+<script>
+  function toggle(head){
+    const body=head.nextElementSibling;
+    const arrow=head.querySelector('.prefix-arrow');
+    const open=body.classList.toggle('open');
+    arrow.classList.toggle('open',open);
+  }
+  function toggleAns(id){
+    const el=document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  let selectedWord=null, matched={};
+  function selectWord(el){
+    document.querySelectorAll('[data-word]').forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedWord=el.dataset.word;
+  }
+  function selectDef(el){
+    if(!selectedWord)return;
+    const def=el.dataset.def;
+    if(selectedWord===def){
+      el.classList.add('correct');
+      document.querySelectorAll('[data-word="'+selectedWord+'"]').forEach(e=>{e.classList.add('correct');e.onclick=null});
+      el.onclick=null;
+      matched[selectedWord]=true;
+    } else {
+      el.classList.add('wrong');
+      document.querySelectorAll('[data-word="'+selectedWord+'"]').forEach(e=>e.classList.add('wrong'));
+      setTimeout(()=>{
+        el.classList.remove('wrong');
+        document.querySelectorAll('[data-word]').forEach(e=>e.classList.remove('wrong','selected'));
+      },800);
+    }
+    selectedWord=null;
+    document.querySelectorAll('[data-word]').forEach(e=>e.classList.remove('selected'));
+    const total=document.querySelectorAll('[data-word]').length;
+    const done=Object.keys(matched).length;
+    if(done>0) document.getElementById('match-score').innerHTML='<strong>'+done+'/'+total+'</strong> správne';
+    if(done===total) document.getElementById('match-score').innerHTML='<strong>Výborne! Všetky správne.</strong>';
+  }
+
+  let fillAnswers={};
+  function checkFill(sel,correct){
+    if(sel.value===correct){sel.classList.add('correct');sel.classList.remove('wrong');}
+    else if(sel.value!==''){sel.classList.add('wrong');sel.classList.remove('correct');}
+    fillAnswers[sel.id]=sel.value===correct;
+    const done=Object.values(fillAnswers).filter(Boolean).length;
+    document.getElementById('fill-score').innerHTML='<strong>'+done+'/8</strong> správne';
+  }
+</script>
+</body>
+</html>

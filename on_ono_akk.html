@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вправа: Злиті форми займенника (Словацька мова)</title>
+    <style>
+        :root {
+            /* Тепла бежево-пастельна палітра */
+            --bg-color: #Fdfbf7;
+            --container-bg: #ffffff;
+            --text-color: #5c5346;
+            --text-light: #8c8273;
+            --accent-primary: #d4b895;
+            --accent-hover: #c4a47d;
+            --border-color: #e8e3dc;
+            --correct-bg: #eaf2e3;
+            --correct-text: #4a6b38;
+            --correct-border: #c8dfb9;
+            --wrong-bg: #fae8e8;
+            --wrong-text: #8c3a3a;
+            --wrong-border: #f0caca;
+            --input-bg: #fcfbfa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(140, 130, 115, 0.08);
+        }
+
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            background: #f7f4f0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .exercise-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .exercise-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .sentence-wrapper {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            line-height: 1.8;
+        }
+
+        .blank-space {
+            display: inline-block;
+            min-width: 80px;
+            height: 1.2rem;
+            border-bottom: 2px solid var(--accent-hover);
+            background-color: rgba(212, 184, 149, 0.15);
+            margin: 0 4px;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .hint {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            font-weight: normal;
+            margin-left: 6px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-color);
+            background-color: var(--input-bg);
+            transition: border-color 0.3s, box-shadow 0.3s;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(212, 184, 149, 0.2);
+        }
+
+        button.check-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+
+        button.check-btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .feedback {
+            margin-top: 12px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            display: block;
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
+            border: 1px solid var(--correct-border);
+        }
+
+        .feedback.wrong {
+            display: block;
+            background-color: var(--wrong-bg);
+            color: var(--wrong-text);
+            border: 1px solid var(--wrong-border);
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px 15px;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            button.check-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Злиті форми займенників</h1>
+    
+    <div class="instruction">
+        <strong>Інструкція:</strong> Доповніть речення правильною формою займенника. У цій вправі використовуйте лише злиті форми з прийменником (<strong>-ňho</strong> для істот або <strong>-ň</strong> для неістот).
+    </div>
+
+    <div id="exercise-container">
+        <!-- Речення генеруються через JavaScript -->
+    </div>
+</div>
+
+<script>
+const sentencesData = [
+    {
+        part1: "Môj brat má dnes narodeniny. Mám pekný darček",
+        part2: ".",
+        hint: "(pre)",
+        correct: "preňho",
+        explanation: "Brat (брат) — це істота, тому до прийменника «pre» додається закінчення «-ňho»."
+    },
+    {
+        part1: "Kde je ten nový stôl? Polož túto kávu",
+        part2: ".",
+        hint: "(na)",
+        correct: "naň",
+        explanation: "Stôl (стіл) — неістота, тому до прийменника «na» додається закінчення «-ň»."
+    },
+    {
+        part1: "Ten čašník je dnes veľmi pomalý. Čakáme",
+        part2: "už dlho.",
+        hint: "(na)",
+        correct: "naňho",
+        explanation: "Čašník (офіціант) — істота, використовуємо форму «-ňho»."
+    },
+    {
+        part1: "Kúpil som si nový mobil. Zaplatil som",
+        part2: "veľa peňazí.",
+        hint: "(za)",
+        correct: "zaň",
+        explanation: "Mobil (телефон) — неістота, використовуємо форму «-ň»."
+    },
+    {
+        part1: "Náš malý syn je chorý. Musíme sa dobre starať",
+        part2: ".",
+        hint: "(o)",
+        correct: "oňho",
+        explanation: "Syn (син) — істота, додаємо закінчення «-ňho»."
+    },
+    {
+        part1: "Toto biele víno vyzerá výborne. Mám veľkú chuť",
+        part2: ".",
+        hint: "(na)",
+        correct: "naň",
+        explanation: "Víno (вино) — неістота, тому правильний варіант «naň»."
+    },
+    {
+        part1: "Náš kuchár pripravil skvelý obed. Máme veľkú pochvalu",
+        part2: ".",
+        hint: "(pre)",
+        correct: "preňho",
+        explanation: "Kuchár (кухар) — істота, використовуємо «-ňho»."
+    },
+    {
+        part1: "Stratil si lístok na autobus? Musíš dávať väčší pozor",
+        part2: ".",
+        hint: "(na)",
+        correct: "naň",
+        explanation: "Lístok (квиток) — неістота, додаємо закінчення «-ň»."
+    },
+    {
+        part1: "Môj otec je teraz v záhrade. Máme dôležitý list",
+        part2: ".",
+        hint: "(pre)",
+        correct: "preňho",
+        explanation: "Otec (батько) — істота, правильна форма «preňho»."
+    },
+    {
+        part1: "To staré auto už nefunguje. Nechcem už dávať peniaze",
+        part2: ".",
+        hint: "(na)",
+        correct: "naň",
+        explanation: "Auto (автомобіль) — неістота, використовуємо «-ň»."
+    },
+    {
+        part1: "Tvoj kamarát má v škole problémy. Máme",
+        part2: "veľké obavy.",
+        hint: "(o)",
+        correct: "oňho",
+        explanation: "Kamarát (друг) — істота, тому злита форма з прийменником «o» буде «oňho»."
+    },
+    {
+        part1: "Tento čerstvý rožok je ešte horúci. Mám",
+        part2: "chuť.",
+        hint: "(na)",
+        correct: "naň",
+        explanation: "Rožok (рогалик) — неістота, правильна форма «naň»."
+    },
+    {
+        part1: "Manažér predajne je v kancelárii. Čakáme",
+        part2: "pred dverami.",
+        hint: "(na)",
+        correct: "naňho",
+        explanation: "Manažér (менеджер) — істота, додаємо закінчення «-ňho»."
+    },
+    {
+        part1: "Ten drahý syr je v chladničke. Dala som",
+        part2: "desať eur.",
+        hint: "(za)",
+        correct: "zaň",
+        explanation: "Syr (сир) — неістота, правильний варіант «zaň»."
+    },
+    {
+        part1: "Ten šikovný predavač nám veľmi pomohol. Máme malý darček",
+        part2: ".",
+        hint: "(pre)",
+        correct: "preňho",
+        explanation: "Predavač (продавець) — істота, використовуємо форму «preňho»."
+    }
+];
+
+const container = document.getElementById('exercise-container');
+
+function renderExercise() {
+    sentencesData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'exercise-item';
+        
+        // Визначаємо, чи потрібен пробіл після пропуску (не ставимо перед крапкою)
+        const space = item.part2.startsWith('.') ? '' : ' ';
+        
+        div.innerHTML = `
+            <div class="sentence-wrapper">
+                ${index + 1}. ${item.part1} <span class="blank-space"></span>${space}${item.part2} <span class="hint">${item.hint}</span>
+            </div>
+            <div class="input-group">
+                <input type="text" id="input-${index}" placeholder="Введіть слово..." autocomplete="off">
+                <button class="check-btn" onclick="checkAnswer(${index})">Перевірити</button>
+            </div>
+            <div class="feedback" id="feedback-${index}"></div>
+        `;
+        
+        container.appendChild(div);
+
+        // Додаємо можливість перевірки по натисканню Enter
+        const inputField = document.getElementById(`input-${index}`);
+        inputField.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkAnswer(index);
+            }
+        });
+    });
+}
+
+window.checkAnswer = function(index) {
+    const inputElement = document.getElementById(`input-${index}`);
+    const feedbackElement = document.getElementById(`feedback-${index}`);
+    const item = sentencesData[index];
+    
+    // Отримуємо значення, прибираємо зайві пробіли та переводимо в нижній регістр
+    const userAnswer = inputElement.value.trim().toLowerCase();
+
+    if (userAnswer === "") {
+        feedbackElement.className = 'feedback wrong';
+        feedbackElement.innerHTML = `Будь ласка, введіть відповідь у поле.`;
+        return;
+    }
+
+    if (userAnswer === item.correct) {
+        feedbackElement.className = 'feedback correct';
+        feedbackElement.innerHTML = `<strong>Правильно!</strong> ${item.explanation}`;
+        inputElement.style.borderColor = "var(--correct-text)";
+    } else {
+        feedbackElement.className = 'feedback wrong';
+        feedbackElement.innerHTML = `<strong>Помилка.</strong> Правильна відповідь: <strong>${item.correct}</strong>. <br>${item.explanation}`;
+        inputElement.style.borderColor = "var(--wrong-text)";
+    }
+};
+
+document.addEventListener('DOMContentLoaded', renderExercise);
+</script>
+
+</body>
+</html>

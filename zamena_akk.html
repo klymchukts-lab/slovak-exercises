@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вправа: Короткі форми займенника (Словацька мова)</title>
+    <style>
+        :root {
+            --bg-color: #Fdfbf7;
+            --container-bg: #ffffff;
+            --text-color: #5c5346;
+            --text-light: #8c8273;
+            --accent-primary: #d4b895;
+            --accent-hover: #c4a47d;
+            --border-color: #e8e3dc;
+            --correct-bg: #eaf2e3;
+            --correct-text: #4a6b38;
+            --correct-border: #c8dfb9;
+            --wrong-bg: #fae8e8;
+            --wrong-text: #8c3a3a;
+            --wrong-border: #f0caca;
+            --btn-bg: #fcfbfa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 15px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(140, 130, 115, 0.08);
+        }
+
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            font-size: 1.6rem;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            background: #f7f4f0;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            color: var(--text-color);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .exercise-item {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+
+        .exercise-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .sentence-wrapper {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 16px;
+            line-height: 1.8;
+            display: inline-block;
+        }
+
+        .blank-space {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 50px;
+            height: 1.4rem;
+            border-bottom: 2px solid var(--accent-hover);
+            background-color: rgba(212, 184, 149, 0.15);
+            margin: 0 4px;
+            padding: 0 10px;
+            border-radius: 4px 4px 0 0;
+            color: var(--accent-hover);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .blank-space.filled {
+            border-bottom-color: var(--correct-text);
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
+        }
+
+        .options-group {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            margin-top: 5px;
+            flex-wrap: wrap;
+        }
+
+        button.choice-btn {
+            flex: 1;
+            min-width: 80px;
+            background: var(--btn-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button.choice-btn:hover {
+            border-color: var(--accent-primary);
+            background-color: rgba(212, 184, 149, 0.1);
+        }
+
+        button.choice-btn.selected-correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-border);
+            color: var(--correct-text);
+        }
+
+        button.choice-btn.selected-wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-border);
+            color: var(--wrong-text);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback.correct {
+            display: block;
+            background-color: var(--correct-bg);
+            color: var(--correct-text);
+            border: 1px solid var(--correct-border);
+        }
+
+        .feedback.wrong {
+            display: block;
+            background-color: var(--wrong-bg);
+            color: var(--wrong-text);
+            border: 1px solid var(--wrong-border);
+        }
+
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px 15px;
+            }
+            .options-group {
+                gap: 8px;
+            }
+            button.choice-btn {
+                padding: 12px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Короткі форми займенників</h1>
+    
+    <div class="instruction">
+        <strong>Інструкція:</strong> Доповніть речення правильною формою займенника, обравши один із запропонованих варіантів. Звертайте увагу на рід та число іменника, який замінює займенник.
+    </div>
+
+    <div id="exercise-container">
+        <!-- Речення генеруються через JavaScript -->
+    </div>
+</div>
+
+<script>
+const sentencesData = [
+    {
+        part1: "Kde je ten nový stôl? Nevidím",
+        part2: ".",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «stôl» — чоловічого роду (однина). Відповідна коротка форма у знахідному відмінку — <strong>ho</strong>."
+    },
+    {
+        part1: "Táto polievka je výborná. Varím",
+        part2: "často.",
+        options: ["ho", "ju", "ich"],
+        correct: "ju",
+        explanation: "Іменник «polievka» — жіночого роду (однина). Відповідна форма — <strong>ju</strong>."
+    },
+    {
+        part1: "Hľadám moje kľúče od auta. Nevidel si",
+        part2: "?",
+        options: ["ho", "ju", "ich"],
+        correct: "ich",
+        explanation: "Іменник «kľúče» має форму множини. Для множини всіх родів використовується форма <strong>ich</strong>."
+    },
+    {
+        part1: "Tento čaj je veľmi studený. Nepijem",
+        part2: ".",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «čaj» — чоловічого роду. Правильний займенник — <strong>ho</strong>."
+    },
+    {
+        part1: "Máš tu tú knihu? Potrebujem",
+        part2: "na víkend.",
+        options: ["ho", "ju", "ich"],
+        correct: "ju",
+        explanation: "Іменник «kniha» — жіночого роду. Використовуємо форму <strong>ju</strong>."
+    },
+    {
+        part1: "Kde je ten nový čašník? Hľadám",
+        part2: "už desať minút.",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «čašník» — чоловічого роду (істота). Коротка форма для знахідного відмінка — <strong>ho</strong>."
+    },
+    {
+        part1: "Kúpil som čerstvé rožky. Dám",
+        part2: "na stôl.",
+        options: ["ho", "ju", "ich"],
+        correct: "ich",
+        explanation: "Іменник «rožky» стоїть у множині. Правильна форма — <strong>ich</strong>."
+    },
+    {
+        part1: "To je pekné auto. Kde si",
+        part2: "kúpil?",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «auto» — середнього роду. У знахідному відмінку для середнього роду використовується форма <strong>ho</strong> (рідше вказовий займенник «to»)."
+    },
+    {
+        part1: "Nevidím tu moju tašku. Kam si",
+        part2: "dal?",
+        options: ["ho", "ju", "ich"],
+        correct: "ju",
+        explanation: "Іменник «taška» — жіночого роду. Правильний займенник — <strong>ju</strong>."
+    },
+    {
+        part1: "Kde sú tie poháre? Potrebujeme",
+        part2: "na víno.",
+        options: ["ho", "ju", "ich"],
+        correct: "ich",
+        explanation: "Іменник «poháre» стоїть у множині. Використовуємо форму <strong>ich</strong>."
+    },
+    {
+        part1: "Tento koláč je veľmi sladký. Nechcem",
+        part2: ".",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «koláč» — чоловічого роду. Правильна форма — <strong>ho</strong>."
+    },
+    {
+        part1: "Tvoja sestra mešká. Čakáme",
+        part2: "vonku.",
+        options: ["ho", "ju", "ich"],
+        correct: "ju",
+        explanation: "Іменник «sestra» — жіночого роду. Використовуємо займенник <strong>ju</strong>."
+    },
+    {
+        part1: "Kde je ten lístok na vlak? Mám",
+        part2: "v peňaženke.",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «lístok» — чоловічого роду. Правильний варіант — <strong>ho</strong>."
+    },
+    {
+        part1: "Tieto topánky sú veľmi staré. Nenosím",
+        part2: ".",
+        options: ["ho", "ju", "ich"],
+        correct: "ich",
+        explanation: "Іменник «topánky» стоїть у множині. Замінюємо його формою <strong>ich</strong>."
+    },
+    {
+        part1: "Kde máš mobil? Neviem",
+        part2: "nájsť.",
+        options: ["ho", "ju", "ich"],
+        correct: "ho",
+        explanation: "Іменник «mobil» — чоловічого роду. Правильна форма — <strong>ho</strong>."
+    }
+];
+
+const container = document.getElementById('exercise-container');
+
+function renderExercise() {
+    sentencesData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'exercise-item';
+        
+        const space = item.part2.startsWith('.') || item.part2.startsWith('?') ? '' : ' ';
+        
+        // Генерація кнопок вибору
+        const buttonsHtml = item.options.map(opt => 
+            `<button class="choice-btn" onclick="checkAnswer(${index}, '${opt}', this)">${opt}</button>`
+        ).join('');
+
+        div.innerHTML = `
+            <div class="sentence-wrapper">
+                ${index + 1}. ${item.part1} <span class="blank-space" id="blank-${index}"></span>${space}${item.part2}
+            </div>
+            <div class="options-group" id="options-${index}">
+                ${buttonsHtml}
+            </div>
+            <div class="feedback" id="feedback-${index}"></div>
+        `;
+        
+        container.appendChild(div);
+    });
+}
+
+window.checkAnswer = function(index, selectedWord, btnElement) {
+    const feedbackElement = document.getElementById(`feedback-${index}`);
+    const blankElement = document.getElementById(`blank-${index}`);
+    const item = sentencesData[index];
+    
+    // Скидаємо стилі всіх кнопок у цьому реченні
+    const allButtons = document.querySelectorAll(`#options-${index} .choice-btn`);
+    allButtons.forEach(btn => {
+        btn.classList.remove('selected-correct');
+        btn.classList.remove('selected-wrong');
+    });
+
+    // Оновлюємо візуальний пропуск обраним словом
+    blankElement.innerText = selectedWord;
+
+    if (selectedWord === item.correct) {
+        btnElement.classList.add('selected-correct');
+        blankElement.classList.add('filled');
+        blankElement.style.color = "var(--correct-text)";
+        
+        feedbackElement.className = 'feedback correct';
+        feedbackElement.innerHTML = `<strong>Правильно!</strong> ${item.explanation}`;
+    } else {
+        btnElement.classList.add('selected-wrong');
+        blankElement.classList.remove('filled');
+        blankElement.style.color = "var(--wrong-text)";
+        
+        feedbackElement.className = 'feedback wrong';
+        feedbackElement.innerHTML = `<strong>Спробуйте ще раз.</strong> Зверніть увагу на рід і число іменника, про який ідеться у першій частині речення.`;
+    }
+};
+
+document.addEventListener('DOMContentLoaded', renderExercise);
+</script>
+
+</body>
+</html>

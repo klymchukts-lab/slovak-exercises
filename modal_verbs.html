@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вправа 24: Doplňte</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .correct {
+            background-color: #dcfce7;
+            border-color: #22c55e;
+        }
+        .incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .missed-correct {
+            border: 2px dashed #22c55e;
+        }
+        .gemini-loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #9333ea;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="max-w-3xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-lg">
+    <header class="mb-8 border-b pb-4">
+        <h1 class="text-3xl font-bold text-gray-800">24: DOPLŇTE.</h1>
+        <p class="text-gray-500 mt-2">Оберіть правильний варіант відповіді для кожного речення.</p>
+    </header>
+
+    <div class="bg-gray-50 p-4 rounded-lg mb-8 border border-gray-200 text-gray-700">
+        <h2 class="font-semibold text-sm text-gray-500 mb-2 uppercase tracking-wide">Приклад:</h2>
+        <p class="mb-3">Prepáčte, <span class="font-bold text-blue-700 border-b-2 border-blue-700 pb-0.5">neviem</span>, koľko je hodín.</p>
+        <div class="flex gap-4 text-sm opacity-70">
+            <span>a) nemôžem</span>
+            <span>b) nepoznám</span>
+            <span class="font-bold border border-gray-400 rounded-full px-2">c) neviem</span>
+        </div>
+    </div>
+
+    <form id="quizForm" class="space-y-8">
+        <div id="questionsContainer"></div>
+
+        <div class="pt-6 border-t mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button type="button" onclick="checkAnswers()" class="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                Перевірити відповіді
+            </button>
+            <div id="resultMessage" class="text-lg font-semibold text-gray-800 hidden"></div>
+        </div>
+        
+        <button type="button" id="resetBtn" onclick="resetQuiz()" class="hidden w-full sm:w-auto px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 mt-4">
+            Спробувати ще раз
+        </button>
+        <button type="button" id="generateBtn" onclick="generateMoreQuestions()" class="w-full sm:w-auto px-6 py-3 bg-purple-100 hover:bg-purple-200 text-purple-800 font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 mt-4 sm:ml-4 flex items-center justify-center gap-2 shadow-sm inline-flex">
+            Згенерувати ще 3 питання ✨
+        </button>
+    </form>
+</div>
+
+<script>
+    const apiKey = ""; // API key is injected by the environment
+
+    async function callGemini(prompt, expectJson = false) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }]
+        };
+        
+        if (expectJson) {
+            payload.generationConfig = { 
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "ARRAY",
+                    items: {
+                        type: "OBJECT",
+                        properties: {
+                            text: { type: "STRING" },
+                            options: {
+                                type: "ARRAY",
+                                items: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        key: { type: "STRING" },
+                                        text: { type: "STRING" }
+                                    }
+                                }
+                            },
+                            correctAnswer: { type: "STRING" }
+                        }
+                    }
+                }
+            };
+        }
+
+        let retries = 5;
+        let delay = 1000;
+        
+        while (retries > 0) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (!text) throw new Error("Empty response from Gemini");
+                
+                return expectJson ? JSON.parse(text) : text;
+            } catch (error) {
+                retries--;
+                if (retries === 0) {
+                    console.error("Gemini API Error after retries:", error);
+                    return null;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+        }
+    }
+
+    let questions = [
+        {
+            id: 1,
+            text: "Peter je chorý. Dnes ................... ísť do práce.",
+            options: [
+                { key: 'a', text: 'nepozná' },
+                { key: 'b', text: 'nemôže' },
+                { key: 'c', text: 'nevie' }
+            ],
+            correctAnswer: 'b'
+        },
+        {
+            id: 2,
+            text: "Áno, ................... Johannu. To je tá študentka z Nemecka!",
+            options: [
+                { key: 'a', text: 'poznáme' },
+                { key: 'b', text: 'vieme' },
+                { key: 'c', text: 'môžeme' }
+            ],
+            correctAnswer: 'a'
+        },
+        {
+            id: 3,
+            text: "Kedy ................... prísť? Večer alebo ráno?",
+            options: [
+                { key: 'a', text: 'viete' },
+                { key: 'b', text: 'môžete' },
+                { key: 'c', text: 'poznáte' }
+            ],
+            correctAnswer: 'b'
+        },
+        {
+            id: 4,
+            text: "Áno, ................... Bratislavu, nechcú mapu.",
+            options: [
+                { key: 'a', text: 'vedia' },
+                { key: 'b', text: 'môžu' },
+                { key: 'c', text: 'poznajú' }
+            ],
+            correctAnswer: 'c'
+        },
+        {
+            id: 5,
+            text: "Ty ................... hrať na klavír. Tak prečo máš doma nový klavír?",
+            options: [
+                { key: 'a', text: 'nevieš' },
+                { key: 'b', text: 'nepoznáš' },
+                { key: 'c', text: 'nemôžeš' }
+            ],
+            correctAnswer: 'a'
+        },
+        {
+            id: 6,
+            text: "Prečo ................... hrať na klavír? Nie je noc!",
+            options: [
+                { key: 'a', text: 'nevieš' },
+                { key: 'b', text: 'nepoznáš' },
+                { key: 'c', text: 'nemôžeš' }
+            ],
+            correctAnswer: 'c'
+        },
+        {
+            id: 7,
+            text: "Prepáč, ale my ..................., kedy príde.",
+            options: [
+                { key: 'a', text: 'nevieme' },
+                { key: 'b', text: 'nepoznáme' },
+                { key: 'c', text: 'nemôžeme' }
+            ],
+            correctAnswer: 'a'
+        },
+        {
+            id: 8,
+            text: "Hm, ................... sa bicyklovať. Nemám čas, musím sa ísť učiť. Zajtra máme test.",
+            options: [
+                { key: 'a', text: 'neviem' },
+                { key: 'b', text: 'nemôžem' },
+                { key: 'c', text: 'nepoznám' }
+            ],
+            correctAnswer: 'b'
+        },
+        {
+            id: 9,
+            text: "Hm, ................... sa bicyklovať. Musím sa naučiť bicyklovať.",
+            options: [
+                { key: 'a', text: 'neviem' },
+                { key: 'b', text: 'nemôžem' },
+                { key: 'c', text: 'nepoznám' }
+            ],
+            correctAnswer: 'a'
+        }
+    ];
+
+    function renderQuestions() {
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+
+        questions.forEach((q, index) => {
+            const questionHTML = createQuestionHTML(q);
+            container.insertAdjacentHTML('beforeend', questionHTML);
+        });
+    }
+
+    function createQuestionHTML(q) {
+        return `
+            <div class="question-block" id="qblock-${q.id}">
+                <p class="text-lg text-gray-800 mb-3"><span class="font-bold mr-2">${q.id}.</span> ${q.text}</p>
+                <div class="flex flex-col sm:flex-row gap-3 sm:gap-6 ml-6">
+                    ${q.options.map(opt => `
+                        <label class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors option-label w-full sm:w-auto">
+                            <input type="radio" name="q${q.id}" value="${opt.key}" class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                            <span class="ml-3 font-medium text-gray-700">${opt.key}) ${opt.text}</span>
+                        </label>
+                    `).join('')}
+                </div>
+                <div id="explanation-container-${q.id}" class="mt-4 ml-6 hidden">
+                    <button type="button" onclick="explainQuestion(${q.id})" class="text-sm text-purple-600 hover:text-purple-800 font-medium flex items-center gap-2 focus:outline-none">
+                        Пояснити правило ✨
+                    </button>
+                    <div id="explanation-text-${q.id}" class="mt-2 text-sm text-gray-700 bg-purple-50 p-4 rounded-lg border border-purple-100 hidden leading-relaxed"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    function checkAnswers() {
+        let score = 0;
+        let allAnswered = true;
+
+        questions.forEach(q => {
+            const selectedOption = document.querySelector(`input[name="q${q.id}"]:checked`);
+            const labels = document.querySelectorAll(`#qblock-${q.id} .option-label`);
+            
+            if (!selectedOption) {
+                allAnswered = false;
+            }
+
+            // Remove previous validation styles
+            labels.forEach(label => {
+                label.classList.remove('correct', 'incorrect', 'missed-correct');
+                label.classList.add('hover:bg-gray-50');
+            });
+
+            if (selectedOption) {
+                const isCorrect = selectedOption.value === q.correctAnswer;
+                const parentLabel = selectedOption.closest('label');
+                parentLabel.classList.remove('hover:bg-gray-50');
+
+                if (isCorrect) {
+                    parentLabel.classList.add('correct');
+                    score++;
+                } else {
+                    parentLabel.classList.add('incorrect');
+                    // Highlight the correct one that was missed
+                    const correctInput = document.querySelector(`input[name="q${q.id}"][value="${q.correctAnswer}"]`);
+                    correctInput.closest('label').classList.add('missed-correct');
+                }
+            } else {
+                 // If not answered, just show the correct one
+                 const correctInput = document.querySelector(`input[name="q${q.id}"][value="${q.correctAnswer}"]`);
+                 correctInput.closest('label').classList.add('missed-correct');
+            }
+
+            // Disable inputs after checking
+            document.querySelectorAll(`input[name="q${q.id}"]`).forEach(input => input.disabled = true);
+            
+            // Show explanation button
+            const expContainer = document.getElementById(`explanation-container-${q.id}`);
+            if (expContainer) expContainer.classList.remove('hidden');
+        });
+
+        const resultMessage = document.getElementById('resultMessage');
+        resultMessage.classList.remove('hidden');
+        resultMessage.innerHTML = `Ваш результат: ${score} / ${questions.length}`;
+
+        document.getElementById('resetBtn').classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+        renderQuestions();
+        document.getElementById('resultMessage').classList.add('hidden');
+        document.getElementById('resetBtn').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function explainQuestion(qId) {
+        const q = questions.find(question => question.id === qId);
+        const btn = document.querySelector(`#explanation-container-${qId} button`);
+        const textContainer = document.getElementById(`explanation-text-${qId}`);
+        
+        btn.innerHTML = `<div class="gemini-loader"></div> Аналізую... ✨`;
+        btn.disabled = true;
+
+        const correctWord = q.options.find(o => o.key === q.correctAnswer).text;
+        const prompt = `Поясни українською мовою, чому правильна відповідь у реченні "${q.text}" - це "${correctWord}". Коротко поясни різницю використання слів vedieť, môcť та poznať у цьому контексті.`;
+        
+        const explanation = await callGemini(prompt);
+        
+        if (explanation) {
+            btn.classList.add('hidden');
+            textContainer.innerHTML = `<span class="font-semibold text-purple-800 flex items-center gap-2 mb-2"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg> Пояснення від Gemini:</span> ${explanation}`;
+            textContainer.classList.remove('hidden');
+        } else {
+            btn.innerHTML = `Помилка. Спробувати ще раз ✨`;
+            btn.disabled = false;
+        }
+    }
+
+    async function generateMoreQuestions() {
+        const btn = document.getElementById('generateBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<div class="gemini-loader"></div> Генерую питання... ✨`;
+        btn.disabled = true;
+
+        const prompt = "Згенеруй 3 нових тестових питання для вивчення словацької мови. Тема: різниця між дієсловами 'vedieť', 'môcť', 'poznať' (знати/вміти/могти). Формат: 'text' (речення словацькою з '...................' замість слова), 'options' (масив з 3 об'єктів з 'key' (a,b,c) та 'text' (варіант відповіді)), 'correctAnswer' (ключ: a, b або c).";
+
+        const newQuestions = await callGemini(prompt, true);
+
+        if (newQuestions && Array.isArray(newQuestions)) {
+            let startId = questions.length + 1;
+            const container = document.getElementById('questionsContainer');
+            
+            newQuestions.forEach(nq => {
+                nq.id = startId++;
+                questions.push(nq);
+                container.insertAdjacentHTML('beforeend', createQuestionHTML(nq));
+            });
+            
+            // Прокрутка до нових питань
+            document.getElementById(`qblock-${newQuestions[0].id}`).scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('resultMessage').classList.add('hidden');
+        } else {
+            alert('Помилка при генерації питань. Можливо, сервіс перевантажений. Спробуйте ще раз.');
+        }
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+
+    // Initialize the quiz
+    renderQuestions();
+</script>
+
+</body>
+</html>

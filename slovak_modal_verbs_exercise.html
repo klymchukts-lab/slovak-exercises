@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вправа: Словацькі модальні дієслова</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+        }
+        .input-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Кастомний скроллбар для естетики */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdf2f8; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fbcfe8; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #f472b6; 
+        }
+    </style>
+</head>
+<body class="text-slate-700 min-h-screen p-4 md:p-8 flex justify-center bg-gradient-to-br from-rose-50 via-purple-50 to-indigo-50 selection:bg-indigo-200 selection:text-indigo-900">
+
+    <div class="max-w-4xl w-full bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white overflow-hidden my-auto">
+        
+        <!-- Header -->
+        <div class="bg-white/50 p-8 md:p-10 border-b border-slate-100/50">
+            <h1 class="text-3xl md:text-4xl font-extrabold mb-3 bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">
+                Словацькі модальні дієслова
+            </h1>
+            <p class="text-slate-500 font-medium text-lg">Інтерактивна вправа на перевірку знань</p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="p-8 md:px-10 md:py-8 bg-indigo-50/30 border-b border-indigo-100/50">
+            <h2 class="font-bold text-lg mb-3 text-indigo-900 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256" class="text-indigo-400">
+                    <path d="M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm16-40a8,8,0,0,1-8,8,16,16,0,0,1-16-16V128a8,8,0,0,1,0-16,16,16,0,0,1,16,16v40A8,8,0,0,1,144,176ZM112,84a12,12,0,1,1,12,12A12,12,0,0,1,112,84Z"></path>
+                </svg>
+                Інструкція
+            </h2>
+            <p class="text-slate-600 leading-relaxed text-base md:text-lg">
+                Прочитайте речення та впишіть правильне модальне дієслово 
+                <span class="font-bold px-2 py-1 bg-white rounded-lg shadow-sm text-indigo-600 mx-1">chcieť, smieť, vedieť, môcť, musieť, mať</span> 
+                у відповідній формі. Звертайте увагу на логіку ситуації: чи це фізична можливість, навичка, дозвіл, обов'язок, порада або відсутність симпатії. Там, де особу складно визначити з контексту, вона вказана в дужках.
+            </p>
+        </div>
+
+        <div id="exercise-container" class="p-8 md:p-10 space-y-10">
+            <!-- JavaScript will inject sentences here -->
+        </div>
+
+    </div>
+
+    <script>
+        const exercises = [
+            {
+                id: 1,
+                before: "Dnes večer (my) ",
+                after: " ísť do divadla, ale zatiaľ nemáme kúpené lístky.",
+                answers: ["chceme"],
+                hint: "Бажання."
+            },
+            {
+                id: 2,
+                before: "Peter ",
+                after: " pracovať dlho do noci, lebo má pred sebou dôležitý pracovný projekt.",
+                answers: ["musí"],
+                hint: "Обов'язок, вимушеність."
+            },
+            {
+                id: 3,
+                before: "(ty) ",
+                after: " hrať na klavíri, alebo ťa to mám naučiť?",
+                answers: ["vieš"],
+                hint: "Навичка або вміння."
+            },
+            {
+                id: 4,
+                before: "Páni, v tejto budove ",
+                after: " fajčiť, je to prísne zakázané.",
+                answers: ["nesmiete"],
+                hint: "Сувора заборона."
+            },
+            {
+                id: 5,
+                before: "",
+                after: " ti pomôcť s tou ťažkou taškou? Mám voľné ruky.",
+                answers: ["môžem"],
+                hint: "Пропозиція допомоги / фізична можливість."
+            },
+            {
+                id: 6,
+                before: "(ty) ",
+                after: " piť viac čistej vody, vonku je veľmi teplo a potrebuješ hydratáciu.",
+                answers: ["máš"],
+                hint: "Порада («тобі слід / ти маєш»)."
+            },
+            {
+                id: 7,
+                before: "Ja kávu veľmi ",
+                after: " , radšej si ráno urobím bylinkový čaj.",
+                answers: ["nemusím"],
+                hint: "Відсутність симпатії (словацька ідіома «не дуже люблю»)."
+            },
+            {
+                id: 8,
+                before: "(oni) ",
+                after: " kúpiť nový byt, lebo ten starý je pre ich rodinu príliš malý.",
+                answers: ["musia", "chcú"],
+                hint: "Обов'язок або сильне бажання через обставини."
+            },
+            {
+                id: 9,
+                before: "",
+                after: " hovoriť po slovensky, preto na úrade nepotrebujem prekladateľa.",
+                answers: ["viem"],
+                hint: "Знання мови (навичка)."
+            },
+            {
+                id: 10,
+                before: "Dnes večer (my) ",
+                after: " prísť na vašu oslavu, lebo ležíme doma s vysokou teplotou.",
+                answers: ["nemôžeme"],
+                hint: "Відсутність фізичної можливості через хворобу."
+            },
+            {
+                id: 11,
+                before: "(vy) ",
+                after: " prečítať túto knihu, lebo zajtra z nej píšete dôležitý test.",
+                answers: ["musíte"],
+                hint: "Зобов'язання."
+            },
+            {
+                id: 12,
+                before: "",
+                after: " si tu sadnúť, alebo je toto miesto pri stole už rezervované?",
+                answers: ["môžem", "smiem"],
+                hint: "Прохання про дозвіл."
+            },
+            {
+                id: 13,
+                before: "(on) ",
+                after: " zavolať manažérovi, alebo má radšej počkať na jeho e-mail?",
+                answers: ["má"],
+                hint: "Запитання про пораду чи обов'язок («чи повинен він...»)."
+            },
+            {
+                id: 14,
+                before: "(oni) romantické komédie veľmi ",
+                after: " , radšej pozerajú dobré detektívky.",
+                answers: ["nemusia"],
+                hint: "Відсутність симпатії (ідіома)."
+            },
+            {
+                id: 15,
+                before: "Moja sestra ",
+                after: " zdvihnúť tú ťažkú krabicu, lebo ju silno bolí chrbát.",
+                answers: ["nemôže"],
+                hint: "Відсутність фізичної здатності або можливості."
+            }
+        ];
+
+        const container = document.getElementById('exercise-container');
+
+        exercises.forEach((ex, index) => {
+            const exerciseDiv = document.createElement('div');
+            exerciseDiv.className = "flex flex-col gap-3 pb-8 border-b border-slate-100 last:border-0 last:pb-0 relative";
+            
+            exerciseDiv.innerHTML = `
+                <div class="flex items-baseline flex-wrap text-lg md:text-xl text-slate-700 leading-9">
+                    <span class="mr-3 font-bold text-slate-300 select-none text-2xl w-8 text-right inline-block">${index + 1}.</span>
+                    ${ex.before ? `<span class="mr-2">${ex.before}</span>` : ''}
+                    
+                    <div class="relative inline-flex items-center mr-2 my-1 group">
+                        <input type="text" id="input-${ex.id}" 
+                            class="input-transition w-36 md:w-44 px-4 py-1.5 border-2 border-indigo-100/70 bg-indigo-50/30 rounded-2xl focus:outline-none focus:border-indigo-300 focus:ring-4 focus:ring-indigo-100 focus:bg-white text-center font-bold text-indigo-900 shadow-sm"
+                            autocomplete="off" spellcheck="false"
+                            onkeypress="handleKeyPress(event, ${ex.id})">
+                        
+                        <button onclick="checkAnswer(${ex.id})" 
+                            class="ml-2 bg-white border-2 border-indigo-50 text-indigo-500 hover:bg-indigo-50 hover:border-indigo-100 hover:text-indigo-600 hover:-translate-y-0.5 active:translate-y-0 p-2.5 rounded-2xl transition-all flex-shrink-0 focus:outline-none shadow-sm"
+                            title="Перевірити">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 256 256">
+                                <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    ${ex.after ? `<span>${ex.after}</span>` : ''}
+                </div>
+                
+                <div id="feedback-${ex.id}" class="hidden text-base mt-1 ml-11 p-4 rounded-2xl flex items-start gap-3 border shadow-sm transition-all duration-300">
+                    <!-- Feedback content will go here -->
+                </div>
+            `;
+            container.appendChild(exerciseDiv);
+        });
+
+        function checkAnswer(id) {
+            const input = document.getElementById(`input-${id}`);
+            const feedback = document.getElementById(`feedback-${id}`);
+            const exercise = exercises.find(e => e.id === id);
+            
+            const userAnswer = input.value.trim().toLowerCase();
+
+            // Скидання всіх стилів
+            input.classList.remove('border-indigo-100/70', 'bg-indigo-50/30', 'border-indigo-300', 'focus:ring-indigo-100', 'focus:bg-white');
+            input.classList.remove('border-teal-400', 'bg-teal-50', 'text-teal-700', 'focus:border-teal-400', 'focus:ring-teal-100');
+            input.classList.remove('border-rose-400', 'bg-rose-50', 'text-rose-700', 'focus:border-rose-400', 'focus:ring-rose-100');
+            input.classList.remove('border-amber-400');
+            
+            feedback.className = "hidden text-base mt-1 ml-11 p-4 rounded-2xl flex items-start gap-3 border shadow-sm transition-all duration-300 opacity-0 transform translate-y-2";
+
+            // Невелика затримка для анімації появи
+            setTimeout(() => {
+                feedback.classList.remove('hidden');
+                
+                // Force reflow
+                void feedback.offsetWidth;
+                
+                feedback.classList.remove('opacity-0', 'translate-y-2');
+                feedback.classList.add('opacity-100', 'translate-y-0');
+            }, 10);
+
+            if (userAnswer === "") {
+                input.classList.add('border-amber-400', 'focus:border-amber-400', 'focus:ring-amber-100');
+                feedback.classList.add('bg-amber-50', 'border-amber-100', 'text-amber-800');
+                feedback.innerHTML = `
+                    <div class="bg-amber-100 text-amber-600 p-1 rounded-full flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <div class="font-medium">Будь ласка, введіть дієслово перед перевіркою.</div>
+                `;
+                return;
+            }
+
+            if (exercise.answers.includes(userAnswer)) {
+                // Правильна відповідь
+                input.classList.add('border-teal-400', 'bg-teal-50', 'text-teal-700', 'focus:border-teal-400', 'focus:ring-teal-100');
+                feedback.classList.add('bg-teal-50', 'border-teal-100', 'text-teal-800');
+                feedback.innerHTML = `
+                    <div class="bg-teal-100 text-teal-600 p-1 rounded-full flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <div><strong class="font-bold">Чудово!</strong> Це правильна відповідь.</div>
+                `;
+            } else {
+                // Неправильна відповідь
+                input.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-700', 'focus:border-rose-400', 'focus:ring-rose-100');
+                feedback.classList.add('bg-rose-50', 'border-rose-100', 'text-rose-800');
+                feedback.innerHTML = `
+                    <div class="bg-rose-100 text-rose-500 p-1 rounded-full flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </div>
+                    <div>
+                        <strong class="font-bold">Потрібно подумати ще.</strong><br>
+                        <span class="text-rose-600/90 mt-1.5 block font-medium">💡 Підказка: ${exercise.hint}</span>
+                    </div>
+                `;
+            }
+        }
+
+        function handleKeyPress(event, id) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkAnswer(id);
+            }
+        }
+    </script>
+</body>
+</html>
